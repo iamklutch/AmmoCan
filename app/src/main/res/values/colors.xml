@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pressed_ocp_button">#80778b28</color>
+    <color name="focused_ocp_button">#aa77b000</color>
+    <color name="ocp_button">#ff774000</color>
+    <color name="default_color">#40777000</color>
+    <color name="pressed_color">#8077b000</color>
+</resources>

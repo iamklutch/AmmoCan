@@ -1,0 +1,73 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="NoActionBar" parent="Theme.AppCompat.NoActionBar"></style>
+
+
+    <style name="AppTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:paddingTop">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:textColor">#ff000000</item>
+        <item name="android:textSize">50sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:text">@string/app_title</item>
+    </style>
+
+    <style name="DevTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#ff000000</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_below">@id/appTitle</item>
+        <item name="android:text">@string/dev_title</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:paddingBottom">24dp</item>
+    </style>
+
+    <style name="TextLinearLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">#aa6b8e23</item>
+        <item name="android:layout_below">@id/devTitle</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="ButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_below">@+id/linearLayout</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">#bb000000</item>
+        <item name="android:background">@drawable/custom_button</item>
+    </style>
+
+    <style name="EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">#40778b28</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">#ff653723</item>
+        <item name="android:layout_marginLeft">@dimen/activity_vertical_margin</item>
+        <item name="android:layout_marginRight">@dimen/activity_vertical_margin</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColorHint">#80000000</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="GridImage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:adjustViewBounds">true</item>
+    </style>
+</resources>
