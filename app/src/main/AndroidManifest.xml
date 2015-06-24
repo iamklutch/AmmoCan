@@ -56,6 +56,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yukidev.ammocan.ui.MainActivity" />
         </activity>
+        <activity
+            android:label="Find Supervisor"
+            android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="portrait"
+            android:name=".ui.EditSupervisorActivity"
+            android:theme="@style/Base.Theme.AppCompat.Light.DarkActionBar">
+        </activity>
+        <activity
+            android:label="Find Airmen"
+            android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="portrait"
+            android:name=".ui.EditAirmenActivity"
+            android:theme="@style/Base.Theme.AppCompat.Light.DarkActionBar">
+        </activity>
     </application>
 
 </manifest>

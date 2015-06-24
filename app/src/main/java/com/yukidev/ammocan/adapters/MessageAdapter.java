@@ -60,12 +60,12 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
 
         holder.timeLabel.setText(convertedDate);
 
-        if (message.getString(ParseConstants.KEY_FILE_TYPE).equals(ParseConstants.TYPE_IMAGE)) {
-            holder.iconImageView.setImageResource(R.drawable.ic_action_editor_attach_file);
-        }
-        else {
+//        if (message.getString(ParseConstants.KEY_FILE_TYPE).equals(ParseConstants.TYPE_IMAGE)) {
+//            holder.iconImageView.setImageResource(R.drawable.ic_action_editor_attach_file);
+//        }
+//        else {
             holder.iconImageView.setImageResource(R.drawable.ic_action_maps_my_location);
-        }
+//        }
 
         holder.nameLabel.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
         return convertView;

@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">AmmoCan</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">News Feed</string>
+    <string name="title_section2">Airmen List</string>
 
     <string name="login_error_message">Please enter a valid username/password</string>
     <string name="signup_error_message">User names must be at least 5 characters, Passwords must be at least 8 characters</string>
@@ -23,16 +22,16 @@
     <string name="title_activity_sign_up">SignUpActivity</string>
 
     <string name="signup_button_label">Sign up!</string>
-    <string name="enter_password_hint">Enter Password</string>
-    <string name="password_again_hint">Enter Password again</string>
+    <string name="enter_password_hint">Password</string>
+    <string name="password_again_hint">Pswd again</string>
     <string name="email_field">Enter an E-Mail address</string>
     <string name="username_login_hint">Enter a Username</string>
     <string name="no_messages">You have no news to view!</string>
 
     <string name="action_done">Done!</string>
     <string name="error_title">We\'re sorry!</string>
-    <string name="add_friends_toast_label">Now add friends with the dropdown menu next to the camera!</string>
-    <string name="no_friends">You have no friends, add some!</string>
+    <string name="add_friends_toast_label">Now add your supervisor or airmen with the dropdown menu in the upper right.</string>
+    <string name="no_friends">You have no Supervisor or Airmen listed, add some!</string>
 
     <string name="action_hint">Action: (what you did...)</string>
     <string name="result_hint">Result: (What happened...)</string>
@@ -40,8 +39,17 @@
     <string name="find_supervisor_airmen_menu">Find Supervisor/Airmen</string>
     <string name="title_activity_message">MessageActivity</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_send_menu">Send</string>
+    <string name="success_message">Message sent!</string>
+    <string name="error_sending_message">There was an error sending your message.  Please try again.</string>
+    <string name="sorry">We/\'re sorry!</string>
+    <string name="push_message">You have a new AmmoCan bullet from %s!</string>
+    <string name="search_title">Search</string>
+
+    <array name="supervisor_airmen">
+        <item name="find_supervisor">Find your Supervisor</item>
+        <item name="find_airmen">Find your Airmen</item>
+    </array>
 
 </resources>

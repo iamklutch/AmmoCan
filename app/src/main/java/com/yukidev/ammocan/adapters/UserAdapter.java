@@ -14,6 +14,7 @@ import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.MD5Util;
+import com.yukidev.ammocan.utils.ParseConstants;
 
 import java.util.List;
 
@@ -43,6 +44,8 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
             holder = new ViewHolder();
             holder.userImageView = (ImageView) convertView.findViewById(R.id.userImageView);
             holder.nameLabel = (TextView) convertView.findViewById(R.id.nameLabel);
+            holder.lastNameLabel = (TextView) convertView.findViewById(R.id.lastNameLabel);
+            holder.squadronLabel = (TextView) convertView.findViewById(R.id.squadronLabel);
             holder.checkImageView = (ImageView)convertView.findViewById(R.id.checkImageView);
             convertView.setTag(holder);
 
@@ -67,6 +70,8 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         }
 
         holder.nameLabel.setText(user.getUsername());
+        holder.lastNameLabel.setText(user.getString(ParseConstants.KEY_LASTNAME));
+        holder.squadronLabel.setText(user.getString(ParseConstants.KEY_SQUADRON));
 
         GridView gridView = (GridView)parent;
         if (gridView.isItemChecked(position)) {
@@ -82,6 +87,8 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         ImageView userImageView;
         ImageView checkImageView;
         TextView nameLabel;
+        TextView lastNameLabel;
+        TextView squadronLabel;
     }
 
     public void refill(List<ParseUser> users) {

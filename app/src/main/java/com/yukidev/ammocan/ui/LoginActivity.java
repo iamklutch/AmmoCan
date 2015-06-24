@@ -62,7 +62,7 @@ public class LoginActivity extends ActionBarActivity {
                     String username = mUsername.getText().toString();
                     String password = mPassword.getText().toString();
 
-                    username = username.trim();
+                    username = username.trim().toLowerCase();
                     password = password.trim();
 
                     if (username.isEmpty() || password.isEmpty()) {
@@ -126,7 +126,7 @@ public class LoginActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_done) {
             return true;
         }
 

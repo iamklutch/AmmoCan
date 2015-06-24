@@ -2,6 +2,7 @@ package com.yukidev.ammocan.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,15 +90,19 @@ public class FriendsFragment extends Fragment {
                     }
 
 
-                } else {
+                } else if (e.getMessage().equals("java.lang.ClassCastException: " +
+                        "java.lang.String cannot be cast to org.json.JSONObject")) {
+                    // Do nothing because this is a parse.com error
+
+                }else {
                     Log.e(TAG, e.getMessage());
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                    builder.setMessage(e.getMessage())
-//                            .setTitle(R.string.error_title)
-//                            .setPositiveButton(android.R.string.ok, null);
-//
-//                    AlertDialog dialog = builder.create();
-//                    dialog.show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(e.getMessage())
+                            .setTitle(R.string.error_title)
+                            .setPositiveButton(android.R.string.ok, null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
 
                 }
             }

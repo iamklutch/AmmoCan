@@ -1,5 +1,7 @@
 package com.yukidev.ammocan.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -14,8 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.parse.ParseAnalytics;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.SectionsPagerAdapter;
@@ -116,17 +121,38 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 navigateToLogin();
                 break;
             case R.id.action_edit_friends:
-                Intent intent = new Intent(this, EditFriendsActivity.class);
-                startActivity(intent);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setItems(R.array.supervisor_airmen, mDialogListener);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
                 break;
             case R.id.action_message:
-                intent = new Intent(this, MessageActivity.class);
+                Intent intent = new Intent(this, MessageActivity.class);
                 startActivity(intent);
                 break;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    protected DialogInterface.OnClickListener mDialogListener = new DialogInterface.OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Intent intent;
+            switch (which) {
+                case 0:
+                    intent = new Intent(MainActivity.this, EditSupervisorActivity.class);
+                    startActivity(intent);
+                    break;
+                case 1:
+                    intent = new Intent(MainActivity.this, EditAirmenActivity.class);
+                    startActivity(intent);
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {

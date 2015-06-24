@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -29,6 +30,8 @@ public class SignUpActivity extends ActionBarActivity {
     protected EditText mUsername;
     protected EditText mPassword;
     protected EditText mPassword2;
+    protected EditText mLastName;
+    protected EditText mSquadron;
     protected EditText mEmail;
     protected Button mSignUpButton;
     @InjectView(R.id.signUpProgressBar)ProgressBar mProgressBar;
@@ -43,6 +46,8 @@ public class SignUpActivity extends ActionBarActivity {
         mUsername = (EditText)findViewById(R.id.usernameField);
         mPassword = (EditText)findViewById(R.id.passwordField);
         mPassword2 = (EditText)findViewById(R.id.passwordField2);
+        mLastName = (EditText)findViewById(R.id.lastNameText);
+        mSquadron = (EditText)findViewById(R.id.squadronText);
         mEmail = (EditText)findViewById(R.id.emailField);
         mSignUpButton = (Button)findViewById(R.id.signupButton);
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
@@ -54,11 +59,15 @@ public class SignUpActivity extends ActionBarActivity {
                     String username = mUsername.getText().toString();
                     String password = mPassword.getText().toString();
                     String password2 = mPassword2.getText().toString();
+                    String lastName = mLastName.getText().toString();
+                    String squadron = mSquadron.getText().toString();
                     String email = mEmail.getText().toString();
 
-                    username = username.trim();
+                    username = username.trim().toLowerCase();
                     password = password.trim();
                     password2 = password2.trim();
+                    lastName = lastName.trim();
+                    squadron = squadron.toUpperCase();
                     email = email.trim();
 
                     if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
@@ -86,6 +95,8 @@ public class SignUpActivity extends ActionBarActivity {
                         newUser.setUsername(username);
                         newUser.setPassword(password);
                         newUser.setEmail(email);
+                        newUser.put(ParseConstants.KEY_LASTNAME, lastName);
+                        newUser.put(ParseConstants.KEY_SQUADRON, squadron);
                         newUser.signUpInBackground(new SignUpCallback() {
                             @Override
                             public void done(ParseException e) {
@@ -132,7 +143,7 @@ public class SignUpActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_done) {
             return true;
         }
 

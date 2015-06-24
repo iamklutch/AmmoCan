@@ -15,14 +15,34 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:maxLines="2"
+        android:layout_height="24dp"
+        android:maxLines="1"
         android:padding="4dp"
         android:id="@+id/nameLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@id/userImageView"
-        android:background="@android:color/white"/>
+        android:background="@color/pressed_color"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:maxLines="1"
+        android:padding="2dp"
+        android:id="@+id/lastNameLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/nameLabel"
+        android:background="@color/pressed_color"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:maxLines="1"
+        android:padding="2dp"
+        android:id="@+id/squadronLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/lastNameLabel"
+        android:background="@color/pressed_color"/>
 </RelativeLayout>

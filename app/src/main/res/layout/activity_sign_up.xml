@@ -29,18 +29,38 @@
             android:hint="@string/username_login_hint"
             style="@style/EditText"/>
         <requestFocus />
-
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        style="@style/TextLinearLayout"
+        android:orientation="horizontal">
         <EditText
             android:id="@+id/passwordField"
             android:inputType="textPassword"
             android:hint="@string/enter_password_hint"
+            android:layout_weight="1"
             style="@style/EditText"/>
         <EditText
             android:id="@+id/passwordField2"
             android:inputType="textPassword"
             android:hint="@string/password_again_hint"
+            android:layout_weight="1"
             style="@style/EditText"/>
-
+    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            style="@style/TextLinearLayout"
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/lastNameText"
+                android:hint="Last Name"
+                android:layout_weight="1"
+                style="@style/EditText"/>
+            <EditText
+                android:id="@+id/squadronText"
+                android:hint="Sqadron"
+                android:layout_weight="1"
+                style="@style/EditText"/>
+        </LinearLayout>
         <EditText
             android:inputType="textEmailAddress"
             android:id="@+id/emailField"
