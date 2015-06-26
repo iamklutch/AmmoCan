@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 
-public class EditAirmenActivity extends Activity {
+public class EditAirmenActivity extends ActionBarActivity {
 
     public static final String TAG = EditAirmenActivity.class.getSimpleName();
 
@@ -66,7 +68,8 @@ public class EditAirmenActivity extends Activity {
         mSendButton = (ImageButton)findViewById(R.id.userGridImageButton);
         mSendButton.setVisibility(View.INVISIBLE);
 
-
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.show();
     }
 
     @Override
@@ -85,7 +88,7 @@ public class EditAirmenActivity extends Activity {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSearchUsername = searchUsername.getText().toString().trim();
+                mSearchUsername = searchUsername.getText().toString().trim().toLowerCase();
                 mProgressBar.setVisibility(View.VISIBLE);
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();

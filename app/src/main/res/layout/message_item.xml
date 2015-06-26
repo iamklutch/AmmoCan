@@ -10,46 +10,67 @@
                   android:layout_marginLeft="@dimen/inbox_horizontal_margin"
                     android:layout_marginRight="@dimen/inbox_horizontal_margin"
                     android:layout_marginTop="@dimen/inbox_vertical_margin"
-                    android:background="@android:color/white">
+                    android:background="@color/pressed_ocp_button">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="82dp"
+            android:layout_height="82dp"
             android:id="@+id/messageIcon"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:src="@drawable/ic_action_maps_my_location"/>
+            android:src="@drawable/bullets"/>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/senderLabel"
+                android:layout_centerVertical="true"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/message_vertical_padding"
+                android:paddingBottom="@dimen/message_vertical_padding"
+                android:layout_toLeftOf="@+id/messageIcon"
+                android:textSize="16sp"
+                android:text="Test Name"
+                android:layout_alignParentLeft="true"
+                android:layout_toStartOf="@+id/messageIcon"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/senderLabel"
+                android:id="@+id/timeLabel"
+                android:text="Time Label"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:layout_toRightOf="@+id/senderLabel"
+                android:textSize="12sp"
+                />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/senderLabel"
+            android:id="@+id/bulletTitleLabel"
             android:layout_centerVertical="true"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/message_vertical_padding"
             android:paddingBottom="@dimen/message_vertical_padding"
-            android:layout_toLeftOf="@+id/messageIcon"
+            android:layout_below="@+id/linearLayout2"
             android:textSize="16sp"
-            android:text="Test Name"
-            android:layout_alignParentLeft="true"
-            android:layout_toStartOf="@+id/messageIcon"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/senderLabel"
-            android:id="@+id/timeLabel"
-            android:text="Time Label"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:layout_toLeftOf="@+id/messageIcon"
-            android:textSize="12sp"
-            android:textColor="@android:color/holo_green_light"
-            />
+            android:text="Test Bullet Title"
+            android:layout_alignParentLeft="true"/>
 
     </RelativeLayout>
 

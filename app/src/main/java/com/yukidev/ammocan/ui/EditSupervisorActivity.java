@@ -89,13 +89,13 @@ public class EditSupervisorActivity extends ActionBarActivity {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSearchUsername = searchUsername.getText().toString().trim();
+                mSearchUsername = searchUsername.getText().toString().trim().toLowerCase();
                 mProgressBar.setVisibility(View.VISIBLE);
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
                 query.whereContains(ParseConstants.KEY_USERNAME, mSearchUsername);
                 query.orderByAscending(ParseConstants.KEY_USERNAME);
-                query.setLimit(10);
+                query.setLimit(100);
                 query.findInBackground(new FindCallback<ParseUser>() {
 
                     @Override
@@ -200,6 +200,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
                 //  add friend
                 mFriendRelation.add(mUsers.get(position));
                 mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, mUsers.get(position).getObjectId());
+                mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_USERNAME, mUsers.get(position).getUsername());
                 checkImageView.setVisibility(View.VISIBLE);
             }
             else {

@@ -37,7 +37,6 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
-
         // the if statement recycles the view (like in recyclerview)
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.message_item, null);
@@ -45,8 +44,8 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
             holder.iconImageView = (ImageView) convertView.findViewById(R.id.messageIcon);
             holder.nameLabel = (TextView) convertView.findViewById(R.id.senderLabel);
             holder.timeLabel = (TextView) convertView.findViewById(R.id.timeLabel);
+            holder.bulletTitleLabel = (TextView) convertView.findViewById(R.id.bulletTitleLabel);
             convertView.setTag(holder);
-
         }
         else {
             holder = (ViewHolder)convertView.getTag();
@@ -59,21 +58,16 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
                 getTime(), now, DateUtils.SECOND_IN_MILLIS).toString();
 
         holder.timeLabel.setText(convertedDate);
-
-//        if (message.getString(ParseConstants.KEY_FILE_TYPE).equals(ParseConstants.TYPE_IMAGE)) {
-//            holder.iconImageView.setImageResource(R.drawable.ic_action_editor_attach_file);
-//        }
-//        else {
-            holder.iconImageView.setImageResource(R.drawable.ic_action_maps_my_location);
-//        }
-
+        holder.iconImageView.setImageResource(R.drawable.bullets);
         holder.nameLabel.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
+        holder.bulletTitleLabel.setText(message.getString(ParseConstants.KEY_BULLET_TITLE));
         return convertView;
     }
     public static class ViewHolder {
         ImageView iconImageView;
         TextView nameLabel;
         TextView timeLabel;
+        TextView bulletTitleLabel;
     }
 
     public void refill(List<ParseObject> messages) {

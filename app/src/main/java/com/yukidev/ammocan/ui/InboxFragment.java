@@ -1,25 +1,27 @@
 package com.yukidev.ammocan.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.adapters.MessageAdapter;
+import com.yukidev.ammocan.utils.ParseConstants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -55,54 +57,83 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onResume() {
         super.onResume();
+        // set progressbar visible
 
-//         set progressbar visible
-
-//        retrieveMessages();
+        retrieveMessages();
     }
 
-//    private void retrieveMessages() {
-//        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESASGES);
-//        query.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
-//        query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> messages, ParseException e) {
-//                // set progress bar invisible
-//
-//                if (mSwipeRefreshLayout.isRefreshing()) {
-//                    mSwipeRefreshLayout.setRefreshing(false);
-//                }
-//
-//                if (e == null) {
-//                    //success
-//                    mMessages = messages;
-//                    String[] usernames = new String[mMessages.size()];
-//                    int i = 0;
-//                    for (ParseObject message : mMessages) {
-//                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
-//                        i++;
-//                        if (getListView().getAdapter() == null) {
-//                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-//                            setListAdapter(adapter);
-//                        } else {
-//                            ((MessageAdapter)getListView().getAdapter()).refill(mMessages);
-//                        }
-//                    }
-//
-//                }
-//
-//            }
-//        });
-//    }
+    private void retrieveMessages() {
+        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+        query.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, ParseUser.getCurrentUser().getObjectId());
+        query.addDescendingOrder(ParseConstants.KEY_CREATED_ON);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> messages, ParseException e) {
+                // set progress bar invisible
 
+                if (mSwipeRefreshLayout.isRefreshing()) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
+                if (e == null) {
+                    //success
+                    mMessages = messages;
+                    String[] usernames = new String[mMessages.size()];
+                    int i = 0;
+                    for (ParseObject message : mMessages) {
+                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                        i++;
+                        if (getListView().getAdapter() == null) {
+                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                            setListAdapter(adapter);
+                        } else {
+                            ((MessageAdapter)getListView().getAdapter()).refill(mMessages);
+                        }
+                    }
+
+                }
+
+            }
+        });
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        this.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Delete Bullet?");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity(), "Bullet deleted", Toast.LENGTH_LONG).show();
+                        ParseObject message = mMessages.get(position);
+                        message.deleteInBackground();
+                    }
+                });
+                builder.setNegativeButton("CANCEL", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return false;
+            }
+        });
+    }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-//        ParseObject message = mMessages.get(position);
-//        String messageType = message.getString(ParseConstants.KEY_FILE_TYPE);
+        ParseObject message = mMessages.get(position);
+        String messageTitle = message.getString(ParseConstants.KEY_BULLET_TITLE);
+        String messageAction = message.getString(ParseConstants.KEY_ACTION);
+        String messageResult = message.getString(ParseConstants.KEY_RESULT);
+        String messageImpact = message.getString(ParseConstants.KEY_IMPACT);
+        String messageCreated = message.getString(ParseConstants.KEY_CREATED_ON);
+
+
 //        ParseFile file = message.getParseFile(ParseConstants.KEY_FILE);
 //        Uri fileUri = Uri.parse(file.getUrl());
 //
@@ -133,5 +164,6 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 //            message.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
 //            message.saveInBackground();
 //        }
+
     }
 }

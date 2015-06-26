@@ -9,9 +9,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -19,11 +17,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
-import com.yukidev.ammocan.adapters.UserAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -33,6 +27,7 @@ public class MessageActivity extends ActionBarActivity {
 
     private static final String TAG = MessageActivity.class.getSimpleName();
 
+    @InjectView(R.id.titleText) EditText mTitleText;
     @InjectView(R.id.actionText) EditText mActionText;
     @InjectView(R.id.resultText) EditText mResultText;
     @InjectView(R.id.impactText) EditText mImpactText;
@@ -106,45 +101,28 @@ public class MessageActivity extends ActionBarActivity {
 
     protected ParseObject createMessage() {
 
-        ParseObject message = new ParseObject(ParseConstants.CLASS_MESASGES);
+        ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
         message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
         message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
         message.put(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
+        message.put(ParseConstants.KEY_BULLET_TITLE, mTitleText.getText().toString());
         message.put(ParseConstants.KEY_ACTION, mActionText.getText().toString());
         message.put(ParseConstants.KEY_RESULT, mResultText.getText().toString());
         message.put(ParseConstants.KEY_IMPACT, mImpactText.getText().toString());
 
-
-//        byte[] fileBytes = FileHelper.getByteArrayFromFile(this, mMediaUri);
-//
-//        if (fileBytes == null) {
-//            return null;
-//        }
-//        else {
-//            if (mFileType.equals(ParseConstants.TYPE_IMAGE)) {
-//                fileBytes = FileHelper.reduceImageForUpload(fileBytes);
-//            }
-//            String fileName = FileHelper.getFileName(this, mMediaUri, mFileType);
-//            ParseFile file = new ParseFile(fileName, fileBytes);
-//            message.put(ParseConstants.KEY_FILE, file);
             return message;
-//        }
     }
 
-    protected ArrayList<String> getSupervisorIds() {
-        ArrayList<String> recipientIds = new ArrayList<String>();
-//        // for loops through all ids, getCount() sets how many there are in the gotten list.
-//        for (int i = 0 ; i < mGridView.getCount() ; i++) {
-//            if (mGridView.isItemChecked(i)) {
-//                recipientIds.add(mFriends.get(i).getObjectId());
-//            }
-//        }
-        return recipientIds;
+    protected String getSupervisorIds() {
+        String supervisorID = ParseUser.getCurrentUser().
+                getString(ParseConstants.KEY_SUPERVISOR_ID);
+
+        return supervisorID;
     }
 
     protected void sendPushNotifications() {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        query.whereContainedIn(ParseConstants.KEY_USER_ID, getSupervisorIds());
+        query.whereContains(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
 
         ParsePush push = new ParsePush();
         push.setQuery(query);

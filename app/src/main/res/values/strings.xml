@@ -46,10 +46,14 @@
     <string name="sorry">We/\'re sorry!</string>
     <string name="push_message">You have a new AmmoCan bullet from %s!</string>
     <string name="search_title">Search</string>
+    <string name="bullet_title">Bullet Title</string>
 
     <array name="supervisor_airmen">
         <item name="find_supervisor">Find your Supervisor</item>
         <item name="find_airmen">Find your Airmen</item>
     </array>
+    <string name="title_activity_view_message">ViewMessageActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>
