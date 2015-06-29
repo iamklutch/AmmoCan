@@ -19,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
@@ -39,6 +40,7 @@ public class SignUpActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_sign_up);
         ButterKnife.inject(this);
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -56,19 +58,12 @@ public class SignUpActivity extends ActionBarActivity {
 
                 if (isNetworkAvailable()) {
 
-                    String username = mUsername.getText().toString();
-                    String password = mPassword.getText().toString();
-                    String password2 = mPassword2.getText().toString();
-                    String lastName = mLastName.getText().toString();
-                    String squadron = mSquadron.getText().toString();
-                    String email = mEmail.getText().toString();
-
-                    username = username.trim().toLowerCase();
-                    password = password.trim();
-                    password2 = password2.trim();
-                    lastName = lastName.trim();
-                    squadron = squadron.toUpperCase();
-                    email = email.trim();
+                    String username = mUsername.getText().toString().trim().toLowerCase();
+                    String password = mPassword.getText().toString().trim();
+                    String password2 = mPassword2.getText().toString().trim();
+                    String lastName = mLastName.getText().toString().trim();
+                    String squadron = mSquadron.getText().toString().toUpperCase();
+                    String email = mEmail.getText().toString().trim().toLowerCase();
 
                     if (username.isEmpty() || password.isEmpty() || email.isEmpty() ||
                             username.length() < 5 || password.length() < 8) {

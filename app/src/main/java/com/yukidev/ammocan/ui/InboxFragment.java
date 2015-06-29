@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         public void onRefresh() {
             // remember getActivity() for context
             Toast.makeText(getActivity(), "reeeeeefresh", Toast.LENGTH_LONG).show();
-//            retrieveMessages();
+            retrieveMessages();
         }
     };
 
@@ -58,14 +59,12 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     public void onResume() {
         super.onResume();
         // set progressbar visible
-
         retrieveMessages();
     }
 
     private void retrieveMessages() {
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
         query.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, ParseUser.getCurrentUser().getObjectId());
-        query.addDescendingOrder(ParseConstants.KEY_CREATED_ON);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
@@ -102,7 +101,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         super.onActivityCreated(savedInstanceState);
         this.getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Delete Bullet?");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -111,6 +110,10 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                         Toast.makeText(getActivity(), "Bullet deleted", Toast.LENGTH_LONG).show();
                         ParseObject message = mMessages.get(position);
                         message.deleteInBackground();
+                        MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                        view.setVisibility(View.GONE);
+                        adapter.remove(message);
+                        adapter.notifyDataSetChanged();
                     }
                 });
                 builder.setNegativeButton("CANCEL", null);
@@ -127,43 +130,9 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         super.onListItemClick(l, v, position, id);
 
         ParseObject message = mMessages.get(position);
-        String messageTitle = message.getString(ParseConstants.KEY_BULLET_TITLE);
-        String messageAction = message.getString(ParseConstants.KEY_ACTION);
-        String messageResult = message.getString(ParseConstants.KEY_RESULT);
-        String messageImpact = message.getString(ParseConstants.KEY_IMPACT);
-        String messageCreated = message.getString(ParseConstants.KEY_CREATED_ON);
 
-
-//        ParseFile file = message.getParseFile(ParseConstants.KEY_FILE);
-//        Uri fileUri = Uri.parse(file.getUrl());
-//
-//        if (messageType.equals(ParseConstants.TYPE_IMAGE)) {
-//            Intent intent = new Intent(getActivity(), ViewImageActivity.class);
-//            intent.setData(fileUri);
-//            startActivity(intent);
-//        }
-//        else {
-//            Intent intent = new Intent(Intent.ACTION_VIEW, fileUri);
-//            intent.setDataAndType(fileUri, "video/*");
-//            startActivity(intent);
-//        }
-//        // delete message
-//        List<String> ids = message.getList(ParseConstants.KEY_RECIPIENT_IDS);
-//
-//        if (ids.size() == 1) {
-//            // last recipient delete message
-//            message.deleteInBackground();
-//        }
-//        else {
-//            //remove recipient
-//            ids.remove(ParseUser.getCurrentUser().getObjectId());
-//
-//            ArrayList<String> idsToRemove = new ArrayList<String>();
-//            idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
-//
-//            message.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
-//            message.saveInBackground();
-//        }
-
+        Intent intent = new Intent(getActivity(), ViewMessageActivity.class);
+        intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
+        startActivity(intent);
     }
 }

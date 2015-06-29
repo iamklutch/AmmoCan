@@ -2,6 +2,7 @@ package com.yukidev.ammocan.ui;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,7 +20,10 @@ import android.widget.Toast;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
+import com.yukidev.ammocan.AmmoCanApplication;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.ExceptionHandler;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -32,10 +36,12 @@ public class LoginActivity extends ActionBarActivity {
     protected EditText mPassword;
     protected Button mLoginButton;
     @InjectView(R.id.loginProgressBar)ProgressBar mProgressBar;
+    @InjectView(R.id.forgotPassText)TextView mForgotPassText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 
@@ -49,6 +55,43 @@ public class LoginActivity extends ActionBarActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                     startActivity(intent);
+                }
+            });
+
+            mForgotPassText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                    final EditText emailEditText = new EditText(LoginActivity.this);
+                    emailEditText.setHint("Enter your email address");
+                    builder.setTitle("Forgot Password?");
+                    builder.setView(emailEditText);
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mProgressBar.setVisibility(View.VISIBLE);
+                            String email = emailEditText.getText().toString().toLowerCase().trim();
+                            ParseUser.requestPasswordResetInBackground(email, new RequestPasswordResetCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        mProgressBar.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(LoginActivity.this,
+                                                "Password reset email sent",
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+                                        mProgressBar.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(LoginActivity.this,
+                                                "There is a problem: " + e.getMessage(),
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    builder.setNegativeButton("CANCEL", null);
+                    builder.create().show();
                 }
             });
 
@@ -85,6 +128,8 @@ public class LoginActivity extends ActionBarActivity {
                                 if (e == null) {
                                     // success logging in
                                     mProgressBar.setVisibility(View.INVISIBLE);
+                                    AmmoCanApplication.updateParseInstallation(user);
+
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

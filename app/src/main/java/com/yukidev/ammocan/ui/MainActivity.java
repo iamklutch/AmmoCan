@@ -24,6 +24,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.SectionsPagerAdapter;
+import com.yukidev.ammocan.utils.ExceptionHandler;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener{
 
@@ -46,6 +47,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
         setContentView(R.layout.activity_main);
 
 
@@ -66,7 +69,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         else {
             Log.i(TAG, currentUser.getUsername());
         }
-
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();

@@ -21,6 +21,7 @@
             android:hint="@string/bullet_title"
             android:maxLines="2"
             style="@style/EditText"/>
+        <requestFocus />
 
     </LinearLayout>
 
@@ -34,8 +35,6 @@
             android:id="@+id/actionText"
             android:hint="@string/action_hint"
             style="@style/EditText"/>
-        <requestFocus />
-
 
     </LinearLayout>
 
@@ -49,7 +48,6 @@
             android:id="@+id/resultText"
             android:hint="@string/result_hint"
             style="@style/EditText"/>
-
 
     </LinearLayout>
 

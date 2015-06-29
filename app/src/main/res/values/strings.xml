@@ -52,8 +52,11 @@
         <item name="find_supervisor">Find your Supervisor</item>
         <item name="find_airmen">Find your Airmen</item>
     </array>
-    <string name="title_activity_view_message">ViewMessageActivity</string>
+
+    <string name="title_activity_view_message">View Bullet</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="action_delete">Delete</string>
+    <string name="forgot_password_text">forgot Password?</string>
 
 </resources>

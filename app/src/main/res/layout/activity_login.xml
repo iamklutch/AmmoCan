@@ -54,6 +54,17 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password_text"
+        android:id="@+id/forgotPassText"
+        android:textColor="#ff000000"
+        android:textSize="20sp"
+        android:layout_below="@+id/signupText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"/>
+
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"

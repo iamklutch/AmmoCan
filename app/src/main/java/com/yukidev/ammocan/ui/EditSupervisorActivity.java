@@ -27,6 +27,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.UserAdapter;
+import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import java.util.List;
@@ -53,6 +54,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.user_grid);
         ButterKnife.inject(this);
 
@@ -134,7 +136,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
                 });
             }
         });
-        builder.setCancelable(false);
+        builder.setNegativeButton("CANCEL", null);
         builder.create().show();
     }
     private void addFriendCheckmarks() {

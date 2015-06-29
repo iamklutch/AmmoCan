@@ -17,6 +17,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.DateHelper;
+import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
@@ -35,6 +37,7 @@ public class MessageActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_message);
         ButterKnife.inject(this);
 
@@ -101,6 +104,9 @@ public class MessageActivity extends ActionBarActivity {
 
     protected ParseObject createMessage() {
 
+        DateHelper today = new DateHelper();
+        String date = today.DateChangerThreeCharMonth();
+
         ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
         message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
         message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
@@ -109,6 +115,7 @@ public class MessageActivity extends ActionBarActivity {
         message.put(ParseConstants.KEY_ACTION, mActionText.getText().toString());
         message.put(ParseConstants.KEY_RESULT, mResultText.getText().toString());
         message.put(ParseConstants.KEY_IMPACT, mImpactText.getText().toString());
+        message.put(ParseConstants.KEY_CREATED_ON, date);
 
             return message;
     }
@@ -122,7 +129,7 @@ public class MessageActivity extends ActionBarActivity {
 
     protected void sendPushNotifications() {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        query.whereContains(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
+        query.whereContains(ParseConstants.KEY_USER_ID, getSupervisorIds());
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
