@@ -38,7 +38,7 @@ public class ViewMessageActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_view_message);
         ButterKnife.inject(this);
 

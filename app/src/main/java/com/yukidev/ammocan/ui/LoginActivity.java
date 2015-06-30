@@ -41,7 +41,7 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 

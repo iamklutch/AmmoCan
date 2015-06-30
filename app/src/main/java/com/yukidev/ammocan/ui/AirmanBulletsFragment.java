@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -18,65 +16,39 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.MessageAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import java.util.List;
 
-
-
 /**
- * Created by James on 5/8/2015.
+ * Created by James on 6/30/2015.
  */
-public class InboxFragment extends android.support.v4.app.ListFragment {
+public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
 
     protected List<ParseObject> mMessages;
-    protected SwipeRefreshLayout mSwipeRefreshLayout;
+    protected String mObjectId;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
-
-        mSwipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
-        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
-
-        return rootView;
-    }
-
-    protected OnRefreshListener mOnRefreshListener = new OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            // remember getActivity() for context
-            Toast.makeText(getActivity(), "Retrieving messages . . .", Toast.LENGTH_SHORT).show();
-            retrieveMessages();
-        }
-    };
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // set progressbar visible
+        Intent intent = getActivity().getIntent();
+        mObjectId = intent.getStringExtra("objectId");
         retrieveMessages();
+        return rootView;
     }
 
     private void retrieveMessages() {
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
-        query.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, ParseUser.getCurrentUser().getObjectId());
+        query.fromLocalDatastore();
+        query.whereEqualTo(ParseConstants.KEY_SENDER_ID, mObjectId);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
-                // set progress bar invisible
-
-                if (mSwipeRefreshLayout.isRefreshing()) {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
 
                 if (e == null) {
                     //success
-                    ParseObject.pinAllInBackground(messages);
                     mMessages = messages;
                     String[] usernames = new String[mMessages.size()];
                     int i = 0;
@@ -95,6 +67,21 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

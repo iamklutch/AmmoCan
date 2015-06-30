@@ -26,10 +26,11 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.MainActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -51,8 +52,8 @@
             android:name=".ui.MessageActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_activity_message"
-            android:screenOrientation="portrait"
             android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -72,11 +73,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat.Light.DarkActionBar" >
         </activity>
-
         <activity
             android:name=".ui.ViewMessageActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_view_message" >
+            android:label="@string/title_activity_view_message"
+            android:screenOrientation="portrait" >
         </activity>
 
         <meta-data
@@ -84,23 +84,26 @@
             android:resource="@drawable/ic_action_edit" />
 
         <service android:name="com.parse.PushService" />
-        <receiver android:name="com.parse.ParseBroadcastReceiver">
+
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
- <!--       <receiver android:name="com.parse.ParsePushBroadcastReceiver" -->
-        <receiver android:name="com.yukidev.ammocan.utils.ParseReceiver"
-                  android:exported="false">
+        <!-- <receiver android:name="com.parse.ParsePushBroadcastReceiver" -->
+        <receiver
+            android:name=".utils.ParseReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.GcmBroadcastReceiver"
-                  android:permission="com.google.android.c2dm.permission.SEND">
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -108,5 +111,11 @@
                 <category android:name="com.yukidev.ammocan" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".ui.AirmanBulletsActivity"
+            android:label="@string/title_activity_airman_bullets" >
+        </activity>
     </application>
+
 </manifest>

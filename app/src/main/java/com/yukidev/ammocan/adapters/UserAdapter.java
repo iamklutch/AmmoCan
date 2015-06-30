@@ -1,14 +1,17 @@
 package com.yukidev.ammocan.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
@@ -80,6 +83,17 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         else {
             holder.checkImageView.setVisibility(View.INVISIBLE);
         }
+//
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(getContext(), "Clicked", Toast.LENGTH_LONG).show();
+//                ParseUser clickedUser =  mUsers.get(position);
+//                String clickedId = clickedUser.getObjectId();
+//                Intent intent = new Intent();
+//                intent.putExtra("objectId", clickedId);
+//            }
+//        });
 
         return convertView;
     }
@@ -96,4 +110,6 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         mUsers.addAll(users);
         notifyDataSetChanged();
     }
+
+
 }

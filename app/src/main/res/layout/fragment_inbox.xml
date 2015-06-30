@@ -29,6 +29,8 @@
         android:id="@android:id/empty"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:textSize="32sp"
         android:text="@string/no_messages"/>
 
 </RelativeLayout>

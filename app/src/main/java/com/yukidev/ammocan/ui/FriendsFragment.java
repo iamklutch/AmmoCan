@@ -1,5 +1,6 @@
 package com.yukidev.ammocan.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -49,6 +51,19 @@ public class FriendsFragment extends Fragment {
 
         mSendButton = (ImageButton)rootView.findViewById(R.id.userGridImageButton);
         mSendButton.setVisibility(View.INVISIBLE);
+
+
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_LONG).show();
+                ParseUser clickedUser = mFriends.get(position);
+                String clickedId = clickedUser.getObjectId();
+                Intent intent = new Intent(getActivity(), AirmanBulletsActivity.class);
+                intent.putExtra("objectId", clickedId);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
@@ -109,4 +124,5 @@ public class FriendsFragment extends Fragment {
         });
 
     }
+
 }
