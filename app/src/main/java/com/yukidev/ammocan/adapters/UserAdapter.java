@@ -58,13 +58,15 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         }
         ParseUser user = mUsers.get(position);
         String email = user.getEmail().toLowerCase();
+        String supervisor = user.getObjectId();
 
         if (email.equals("")) {
             holder.userImageView.setImageResource(R.drawable.avatar_empty);
+        }else if (ParseUser.getCurrentUser().getString(ParseConstants.KEY_SUPERVISOR_ID).equals(supervisor)) {
+            holder.userImageView.setImageResource(R.drawable.avatar_supervisor);
         }else {
             String hash = MD5Util.md5Hex(email);
             String gravatarUrl = "http://www.gravatar.com/avatar/" + hash + "?s=204&d=404";
-            Log.d("TEST:  ", gravatarUrl);
 
             Picasso.with(mContext)
                     .load(gravatarUrl)
@@ -83,17 +85,6 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         else {
             holder.checkImageView.setVisibility(View.INVISIBLE);
         }
-//
-//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(getContext(), "Clicked", Toast.LENGTH_LONG).show();
-//                ParseUser clickedUser =  mUsers.get(position);
-//                String clickedId = clickedUser.getObjectId();
-//                Intent intent = new Intent();
-//                intent.putExtra("objectId", clickedId);
-//            }
-//        });
 
         return convertView;
     }

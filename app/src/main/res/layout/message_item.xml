@@ -41,6 +41,7 @@
                 android:layout_toLeftOf="@+id/messageIcon"
                 android:textSize="16sp"
                 android:text="Test Name"
+                android:textColor="#ff000000"
                 android:layout_alignParentLeft="true"
                 android:layout_toStartOf="@+id/messageIcon"/>
 
@@ -50,6 +51,7 @@
                 android:layout_below="@id/senderLabel"
                 android:id="@+id/timeLabel"
                 android:text="Time Label"
+                android:textColor="#ff000000"
                 android:layout_alignParentLeft="true"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:layout_toRightOf="@+id/senderLabel"
@@ -67,6 +69,7 @@
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/message_vertical_padding"
             android:paddingBottom="@dimen/message_vertical_padding"
+            android:textColor="#ff000000"
             android:layout_below="@+id/linearLayout2"
             android:textSize="16sp"
             android:text="Test Bullet Title"

@@ -23,5 +23,7 @@ public final class ParseConstants {
     public static final String KEY_SUPERVISOR_USERNAME = "supUsername";
     public static final String KEY_SQUADRON = "squadron";
     public static final String KEY_BULLET_TITLE = "bulletTitle";
-
+    public static final String KEY_VIEWED = "viewed";
+    public static final String KEY_BEEN_SENT = "hasBeenSent";
+    public static final String LOCAL_STORAGE = "localStorage";
 }

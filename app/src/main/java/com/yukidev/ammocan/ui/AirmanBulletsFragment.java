@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -20,6 +22,7 @@ import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.MessageAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 /**
@@ -27,6 +30,9 @@ import java.util.List;
  */
 public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
 
+    private static final String TAG = AirmanBulletsFragment.class.getSimpleName();
+
+    private ProgressBar mProgressBar;
     protected List<ParseObject> mMessages;
     protected String mObjectId;
 
@@ -36,13 +42,16 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
         Intent intent = getActivity().getIntent();
         mObjectId = intent.getStringExtra("objectId");
         retrieveMessages();
+        mProgressBar = (ProgressBar) rootView.findViewById(R.id.inboxProgressBar);
+        mProgressBar.setVisibility(View.INVISIBLE);
         return rootView;
     }
 
     private void retrieveMessages() {
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
-        query.fromLocalDatastore();
         query.whereEqualTo(ParseConstants.KEY_SENDER_ID, mObjectId);
+        query.fromLocalDatastore();
+        query.fromPin(ParseConstants.CLASS_MESSAGES);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
@@ -52,15 +61,19 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
                     mMessages = messages;
                     String[] usernames = new String[mMessages.size()];
                     int i = 0;
-                    for (ParseObject message : mMessages) {
-                        usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
-                        i++;
-                        if (getListView().getAdapter() == null) {
-                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-                            setListAdapter(adapter);
-                        } else {
-                            ((MessageAdapter)getListView().getAdapter()).refill(mMessages);
+                    try {
+                        for (ParseObject message : mMessages) {
+                            usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                            i++;
+//                            if (getListView().getAdapter() == null) {
+                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                setListAdapter(adapter);
+//                            } else {
+//                                ((MessageAdapter) getListView().getAdapter()).refill(mMessages);
+//                            }
                         }
+                    } catch (ConcurrentModificationException ccm) {
+                        Log.e(TAG, "ConcurrentMod Exception: " + ccm.getMessage());
                     }
 
                 }
@@ -121,6 +134,7 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
 
         Intent intent = new Intent(getActivity(), ViewMessageActivity.class);
         intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
+        intent.putExtra(ParseConstants.LOCAL_STORAGE, true);
         startActivity(intent);
     }
 }

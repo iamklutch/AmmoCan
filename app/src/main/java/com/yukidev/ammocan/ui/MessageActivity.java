@@ -1,6 +1,9 @@
 package com.yukidev.ammocan.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +12,9 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
@@ -29,6 +35,8 @@ public class MessageActivity extends ActionBarActivity {
 
     private static final String TAG = MessageActivity.class.getSimpleName();
 
+    private ParseObject mMessage;
+    InterstitialAd mInterstitialAd;
     @InjectView(R.id.titleText) EditText mTitleText;
     @InjectView(R.id.actionText) EditText mActionText;
     @InjectView(R.id.resultText) EditText mResultText;
@@ -40,7 +48,9 @@ public class MessageActivity extends ActionBarActivity {
 //        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_message);
         ButterKnife.inject(this);
-
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        requestNewInterstitial();
     }
 
     @Override
@@ -67,11 +77,16 @@ public class MessageActivity extends ActionBarActivity {
                             .setPositiveButton(android.R.string.ok, null);
                     AlertDialog dialog = builder.create();
                     dialog.show();
+                } else if (!isNetworkAvailable() == true){
+                    message.put(ParseConstants.KEY_BEEN_SENT, false);
+                    message.pinInBackground();
+                    Toast.makeText(this, "Network unavailable, will send when connection is available",
+                            Toast.LENGTH_LONG).show();
                 } else {
+                    message.put(ParseConstants.KEY_BEEN_SENT, true);
                     send(message);
                     finish();
                 }
-                send(message);
                 break;
         }
 
@@ -79,25 +94,39 @@ public class MessageActivity extends ActionBarActivity {
     }
 
     protected void send(ParseObject message) {
-        message.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    //success
-                    Toast.makeText(MessageActivity.this, getString(R.string.success_message),
-                            Toast.LENGTH_LONG).show();
-                    sendPushNotifications();
-                }
-                else {
-                    Log.e(TAG, e.getMessage());
+        mMessage = message;
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
-                    builder.setMessage(getString(R.string.error_sending_message))
-                            .setTitle(getString(R.string.sorry))
-                            .setPositiveButton(android.R.string.ok, null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+
+        }
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                mMessage.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            //success
+                            Toast.makeText(MessageActivity.this, getString(R.string.success_message),
+                                    Toast.LENGTH_LONG).show();
+                            sendPushNotifications();
+                        } else {
+                            Log.e(TAG, e.getMessage());
+                            Toast.makeText(MessageActivity.this, "Problem sending message: " +
+                                    e.getMessage(), Toast.LENGTH_LONG).show();
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+//                            builder.setMessage(getString(R.string.error_sending_message))
+//                                    .setTitle(getString(R.string.sorry))
+//                                    .setPositiveButton(android.R.string.ok, null);
+//                            AlertDialog dialog = builder.create();
+//                            dialog.show();
+                        }
+                    }
+                });
             }
         });
     }
@@ -116,6 +145,7 @@ public class MessageActivity extends ActionBarActivity {
         message.put(ParseConstants.KEY_RESULT, mResultText.getText().toString());
         message.put(ParseConstants.KEY_IMPACT, mImpactText.getText().toString());
         message.put(ParseConstants.KEY_CREATED_ON, date);
+        message.put(ParseConstants.KEY_VIEWED, false);
 
             return message;
     }
@@ -136,6 +166,25 @@ public class MessageActivity extends ActionBarActivity {
         push.setMessage(getString(R.string.push_message, ParseUser.getCurrentUser().getUsername()));
         push.sendInBackground();
 
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("YOUR_DEVICE_HASH")
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+        }
+        return isAvailable;
     }
 
     @Override

@@ -34,6 +34,7 @@ public class ViewMessageActivity extends ActionBarActivity {
     @InjectView(R.id.impactTextView)TextView mImpactText;
     @InjectView(R.id.createdOnTextView)TextView mCreatedOn;
     private ParseObject mMessage;
+    private Boolean mStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public class ViewMessageActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
         String mMessageId = intent.getStringExtra(ParseConstants.KEY_OBJECT_ID);
+        mStorage = intent.getBooleanExtra(ParseConstants.LOCAL_STORAGE, false);
 
         mActionText.setMovementMethod(new ScrollingMovementMethod());
         mResultText.setMovementMethod(new ScrollingMovementMethod());
@@ -73,8 +75,14 @@ public class ViewMessageActivity extends ActionBarActivity {
     }
 
     private ParseObject getMessage (String objectId) throws ParseException {
+        ParseObject message;
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_MESSAGES);
-        ParseObject message = query.get(objectId);
+        if (mStorage == true) {
+            message = query.fromLocalDatastore().get(objectId);
+        } else {
+            message = query.get(objectId);
+        }
+
         return message;
     }
 

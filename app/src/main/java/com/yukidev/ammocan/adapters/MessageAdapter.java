@@ -31,6 +31,8 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
 
         mContext = context;
         mMessages = messages;
+
+
     }
 
     @Override

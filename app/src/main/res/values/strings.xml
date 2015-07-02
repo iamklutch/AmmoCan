@@ -58,6 +58,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_delete">Delete</string>
     <string name="forgot_password_text">forgot Password?</string>
-    <string name="title_activity_airman_bullets">AirmanBulletsActivity</string>
+    <string name="title_activity_airman_bullets">Bullets List</string>
+    <!--Real Ad ID-->
+    <!--<String name="banner_ad_unit_id">ca-app-pub-7998491028752978/3341715049</String>-->
+    <!--Test Ad ID-->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
 </resources>

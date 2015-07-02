@@ -19,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.parse.ParseAnalytics;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -67,7 +69,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             navigateToLogin();
         }
         else {
-            Log.i(TAG, currentUser.getUsername());
         }
 
         // Set up the action bar.
