@@ -26,7 +26,7 @@
     <string name="password_again_hint">Pswd again</string>
     <string name="email_field">Enter an E-Mail address</string>
     <string name="username_login_hint">Enter a Username</string>
-    <string name="no_messages">You have no news to view!</string>
+    <string name="no_messages">No current Messages</string>
 
     <string name="action_done">Done!</string>
     <string name="error_title">We\'re sorry!</string>

@@ -99,7 +99,21 @@ public class MessageActivity extends ActionBarActivity {
         if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
         } else {
-
+            mMessage.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        //success
+                        Toast.makeText(MessageActivity.this, getString(R.string.success_message),
+                                Toast.LENGTH_LONG).show();
+                        sendPushNotifications();
+                    } else {
+                        Log.e(TAG, e.getMessage());
+                        Toast.makeText(MessageActivity.this, "Problem sending message: " +
+                                e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
         }
 
         mInterstitialAd.setAdListener(new AdListener() {
@@ -118,12 +132,6 @@ public class MessageActivity extends ActionBarActivity {
                             Log.e(TAG, e.getMessage());
                             Toast.makeText(MessageActivity.this, "Problem sending message: " +
                                     e.getMessage(), Toast.LENGTH_LONG).show();
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
-//                            builder.setMessage(getString(R.string.error_sending_message))
-//                                    .setTitle(getString(R.string.sorry))
-//                                    .setPositiveButton(android.R.string.ok, null);
-//                            AlertDialog dialog = builder.create();
-//                            dialog.show();
                         }
                     }
                 });

@@ -21,12 +21,20 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.parse.FindCallback;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.SectionsPagerAdapter;
 import com.yukidev.ammocan.utils.ExceptionHandler;
+import com.yukidev.ammocan.utils.ParseConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener{
 
@@ -69,6 +77,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             navigateToLogin();
         }
         else {
+            messageUpdater();
         }
 
         // Set up the action bar.
@@ -172,45 +181,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     }
 
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-//    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-//
-//        public SectionsPagerAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position) {
-//            // getItem is called to instantiate the fragment for the given page.
-//            // Return a PlaceholderFragment (defined as a static inner class below).
-//            return PlaceholderFragment.newInstance(position + 1);
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            // Show 3 total pages.
-//            return 3;
-//        }
-
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            Locale l = Locale.getDefault();
-//            switch (position) {
-//                case 0:
-//                    return getString(R.string.title_section1).toUpperCase(l);
-//                case 1:
-//                    return getString(R.string.title_section2).toUpperCase(l);
-//                case 2:
-//                    return getString(R.string.title_section3).toUpperCase(l);
-//            }
-//            return null;
-//        }
-//    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -249,6 +219,52 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    private void messageUpdater() {
+        ParseQuery<ParseObject> query1 = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+        query1.fromLocalDatastore();
+        query1.whereEqualTo(ParseConstants.KEY_VIEWED, false);
+
+        ParseQuery<ParseObject> query2 = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+        query2.fromLocalDatastore();
+        query2.whereEqualTo(ParseConstants.KEY_BEEN_SENT, false);
+
+        List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<ParseQuery<ParseObject>>();
+        bothQuerys.add(query1);
+        bothQuerys.add(query2);
+
+        ParseQuery<ParseObject> mainQuery = ParseQuery.or(bothQuerys);
+        mainQuery.fromLocalDatastore();
+        mainQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < list.size(); i++) {
+                        ParseObject currentMessage = list.get(i);
+                        currentMessage.put(ParseConstants.KEY_BEEN_SENT, true);
+                        currentMessage.put(ParseConstants.KEY_VIEWED, true);
+                        currentMessage.saveEventually(new SaveCallback() {
+                            @Override
+                            public void done(ParseException f) {
+                                if (f == null) {
+
+                                } else {
+                                    Toast.makeText(MainActivity.this,
+                                            "Background message update failed",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            "Stored messages unavailable",
+                            Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
     }
 
 }
