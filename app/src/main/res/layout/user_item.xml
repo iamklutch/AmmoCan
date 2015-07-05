@@ -8,8 +8,14 @@
         style="@style/GridImage"/>
 
     <ImageView
-        android:id="@+id/checkImageView"
-        android:src="@drawable/avatar_selected"
+    android:id="@+id/checkImageView"
+    android:src="@drawable/avatar_selected"
+    style="@style/GridImage"
+    android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/supervisorImageView"
+        android:src="@drawable/avatar_supervisor"
         style="@style/GridImage"
         android:visibility="invisible"/>
 

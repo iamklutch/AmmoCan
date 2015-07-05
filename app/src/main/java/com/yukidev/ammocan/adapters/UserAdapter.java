@@ -50,6 +50,7 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
             holder.lastNameLabel = (TextView) convertView.findViewById(R.id.lastNameLabel);
             holder.squadronLabel = (TextView) convertView.findViewById(R.id.squadronLabel);
             holder.checkImageView = (ImageView)convertView.findViewById(R.id.checkImageView);
+            holder.supervisorImageView = (ImageView)convertView.findViewById(R.id.supervisorImageView);
             convertView.setTag(holder);
 
         }
@@ -62,8 +63,6 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
 
         if (email.equals("")) {
             holder.userImageView.setImageResource(R.drawable.avatar_empty);
-        }else if (ParseUser.getCurrentUser().getString(ParseConstants.KEY_SUPERVISOR_ID).equals(supervisor)) {
-            holder.userImageView.setImageResource(R.drawable.avatar_supervisor);
         }else {
             String hash = MD5Util.md5Hex(email);
             String gravatarUrl = "http://www.gravatar.com/avatar/" + hash + "?s=204&d=404";
@@ -72,6 +71,13 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
                     .load(gravatarUrl)
                     .placeholder(R.drawable.avatar_empty)
                     .into(holder.userImageView);
+        }
+
+        if (ParseUser.getCurrentUser().getString(ParseConstants.KEY_SUPERVISOR_ID).equals(supervisor)) {
+            holder.supervisorImageView.setImageResource(R.drawable.avatar_supervisor);
+            holder.supervisorImageView.setVisibility(View.VISIBLE);
+        } else {
+            holder.supervisorImageView.setVisibility(View.INVISIBLE);
         }
 
         holder.nameLabel.setText(user.getUsername());
@@ -94,6 +100,7 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         TextView nameLabel;
         TextView lastNameLabel;
         TextView squadronLabel;
+        ImageView supervisorImageView;
     }
 
     public void refill(List<ParseUser> users) {

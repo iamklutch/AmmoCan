@@ -121,7 +121,9 @@
 
         <activity
             android:name=".ui.AirmanBulletsActivity"
-            android:label="@string/title_activity_airman_bullets" >
+            android:label="@string/title_activity_airman_bullets"
+            android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="portrait" >
         </activity>
 
     </application>

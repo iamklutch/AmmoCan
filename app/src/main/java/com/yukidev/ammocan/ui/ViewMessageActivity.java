@@ -16,6 +16,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.DateHelper;
 import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
@@ -61,10 +62,18 @@ public class ViewMessageActivity extends ActionBarActivity {
             String messageImpact = mMessage.getString(ParseConstants.KEY_IMPACT);
             String messageCreated = mMessage.getString(ParseConstants.KEY_CREATED_ON);
 
+            String decryptedAction = decryptThis(mMessage.getString(ParseConstants.KEY_SENDER_ID),
+                    messageAction);
+            String decryptedResult = decryptThis(mMessage.getString(ParseConstants.KEY_SENDER_ID),
+                    messageResult);
+            String decryptedImpact = decryptThis(mMessage.getString(ParseConstants.KEY_SENDER_ID),
+                    messageImpact);
+
+
             mTitleText.setText(messageTitle);
-            mActionText.setText(messageAction);
-            mResultText.setText(messageResult);
-            mImpactText.setText(messageImpact);
+            mActionText.setText(decryptedAction);
+            mResultText.setText(decryptedResult);
+            mImpactText.setText(decryptedImpact);
             mCreatedOn.setText(messageCreated);
 
         }catch (ParseException e) {
@@ -109,5 +118,17 @@ public class ViewMessageActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String decryptThis(String pass, String encryptedData) {
+        String decryptedData = "";
+
+        try {
+            Crypto crypto = new Crypto(pass);
+            decryptedData = crypto.decrypt(encryptedData);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        return decryptedData;
     }
 }

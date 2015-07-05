@@ -20,7 +20,7 @@ public class DateHelper {
         int Month = c.get(Calendar.MONTH);
         int Day = c.get(Calendar.DATE);
 
-        String newDate = (Day + 1) + "/" + (Month + 1) + "/" + Year;
+        String newDate = Day + "/" + (Month + 1) + "/" + Year;
 
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date dateObject;

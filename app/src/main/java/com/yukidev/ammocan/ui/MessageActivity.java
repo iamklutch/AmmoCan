@@ -23,6 +23,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.DateHelper;
 import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
@@ -141,17 +142,26 @@ public class MessageActivity extends ActionBarActivity {
 
     protected ParseObject createMessage() {
 
+        String pass = ParseUser.getCurrentUser().getObjectId();
         DateHelper today = new DateHelper();
         String date = today.DateChangerThreeCharMonth();
+
+        String action = mActionText.getText().toString();
+        String result = mResultText.getText().toString();
+        String impact = mImpactText.getText().toString();
+
+        String encryptedAction = encryptThis(pass, action);
+        String encryptedResult = encryptThis(pass, result);
+        String encryptedImpact = encryptThis(pass, impact);
 
         ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
         message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
         message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
         message.put(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
         message.put(ParseConstants.KEY_BULLET_TITLE, mTitleText.getText().toString());
-        message.put(ParseConstants.KEY_ACTION, mActionText.getText().toString());
-        message.put(ParseConstants.KEY_RESULT, mResultText.getText().toString());
-        message.put(ParseConstants.KEY_IMPACT, mImpactText.getText().toString());
+        message.put(ParseConstants.KEY_ACTION, encryptedAction);
+        message.put(ParseConstants.KEY_RESULT, encryptedResult);
+        message.put(ParseConstants.KEY_IMPACT, encryptedImpact);
         message.put(ParseConstants.KEY_CREATED_ON, date);
         message.put(ParseConstants.KEY_VIEWED, false);
 
@@ -198,49 +208,18 @@ public class MessageActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
-//
-//        mCurrentUser = ParseUser.getCurrentUser();
-//        mFriendRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
-//
-//        ParseQuery<ParseUser> query =  mFriendRelation.getQuery();
-//        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
-//        query.findInBackground(new FindCallback<ParseUser>() {
-//
-//            @Override
-//            public void done(List<ParseUser> friends, ParseException e) {
-//                if (e == null) {
-//
-//                    // gets user friends list
-//                    mFriends = friends;
-//
-//                    String[] usernames = new String[mFriends.size()];
-//                    int i = 0;
-//                    for (ParseUser user : mFriends) {
-//                        usernames[i] = user.getUsername();
-//                        i++;
-//                    }
-//                    if (mGridView.getAdapter() == null) {
-//                        UserAdapter adapter = new UserAdapter(MessageActivity.this, mFriends);
-//                        mGridView.setAdapter(adapter);
-//                    } else {
-//                        ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
-//                    }
-//
-//                } else {
-//                    Log.e(TAG, e.getMessage());
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(mGridView.getContext());
-//                    builder.setMessage(e.getMessage())
-//                            .setTitle(R.string.error_title)
-//                            .setPositiveButton(android.R.string.ok, null);
-//
-//                    AlertDialog dialog = builder.create();
-//                    dialog.show();
-//
-//                }
-//            }
-//        });
-//
+
     }
 
+    private String encryptThis(String pass, String data) {
+        String encryptedData = "";
+        try {
+            Crypto crypto = new Crypto(pass);
+            encryptedData = crypto.encrypt(data);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        return encryptedData;
+    }
 
 }
