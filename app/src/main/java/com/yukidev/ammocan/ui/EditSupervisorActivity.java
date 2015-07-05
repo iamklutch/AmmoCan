@@ -88,11 +88,11 @@ public class EditSupervisorActivity extends ActionBarActivity {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final EditText searchVariable = new EditText(this);
-        searchVariable.setHint("Supervisors username");
+        searchVariable.setHint("Username, last name, or unit");
         builder.setTitle(getString(R.string.search_title));
         builder.setMessage("Enter your supervisors username, last name, or unit");
         builder.setView(searchVariable);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mUsernameSearchVariable = searchVariable.getText().toString().trim().toLowerCase();

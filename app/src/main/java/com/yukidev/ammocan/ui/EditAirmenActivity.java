@@ -31,6 +31,7 @@ import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 import com.yukidev.ammocan.adapters.UserAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -46,7 +47,9 @@ public class EditAirmenActivity extends ActionBarActivity {
     protected ParseUser mCurrentUser;
     protected GridView mGridView;
     protected ImageButton mSendButton;
-    protected String mSearchUsername;
+    protected String mUnitSearchVariable;
+    protected String mLastNameSearchVariable;
+    protected String mUsernameSearchVariable;
 
     @InjectView(R.id.userGridProgressBar)ProgressBar mProgressBar;
 
@@ -82,22 +85,37 @@ public class EditAirmenActivity extends ActionBarActivity {
         mFriendRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final EditText searchUsername = new EditText(this);
-        searchUsername.setHint("Airman's username");
+        final EditText searchVariable = new EditText(this);
+        searchVariable.setHint("Username, last name or unit");
         builder.setTitle(getString(R.string.search_title));
-        builder.setMessage("Enter your airman's username");
-        builder.setView(searchUsername);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setMessage("Enter your airman's username, last name, or unit");
+        builder.setView(searchVariable);
+        builder.setPositiveButton("SEARCH", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSearchUsername = searchUsername.getText().toString().trim().toLowerCase();
+                mUsernameSearchVariable = searchVariable.getText().toString().trim().toLowerCase();
+                mLastNameSearchVariable = searchVariable.getText().toString();
+                mUnitSearchVariable = searchVariable.getText().toString().trim().toUpperCase();
                 mProgressBar.setVisibility(View.VISIBLE);
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
-                query.whereStartsWith(ParseConstants.KEY_USERNAME, mSearchUsername);
-                query.orderByAscending(ParseConstants.KEY_USERNAME);
-                query.setLimit(100);
-                query.findInBackground(new FindCallback<ParseUser>() {
+                query.whereContains(ParseConstants.KEY_USERNAME, mUsernameSearchVariable);
+
+                ParseQuery<ParseUser> query2 = ParseUser.getQuery();
+                query2.whereEqualTo(ParseConstants.KEY_LASTNAME, mLastNameSearchVariable);
+
+                ParseQuery<ParseUser> query3 = ParseUser.getQuery();
+                query3.whereContains(ParseConstants.KEY_SQUADRON, mUnitSearchVariable);
+
+                List<ParseQuery<ParseUser>> allQuerys = new ArrayList<ParseQuery<ParseUser>>();
+                allQuerys.add(query);
+                allQuerys.add(query2);
+                allQuerys.add(query3);
+
+                ParseQuery<ParseUser> mainQuery = ParseQuery.or(allQuerys);
+                mainQuery.orderByAscending(ParseConstants.KEY_LASTNAME);
+                mainQuery.setLimit(100);
+                mainQuery.findInBackground(new FindCallback<ParseUser>() {
 
                     @Override
                     public void done(List<ParseUser> list, ParseException e) {
@@ -135,7 +153,7 @@ public class EditAirmenActivity extends ActionBarActivity {
                 });
             }
         });
-        builder.setCancelable(false);
+        builder.setNegativeButton("CANCEL", null);
         builder.create().show();
     }
     private void addFriendCheckmarks() {

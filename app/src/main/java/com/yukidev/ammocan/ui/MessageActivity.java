@@ -78,10 +78,10 @@ public class MessageActivity extends ActionBarActivity {
                             .setPositiveButton(android.R.string.ok, null);
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                } else if (!isNetworkAvailable() == true){
+                } else if (!isNetworkAvailable()){
                     message.put(ParseConstants.KEY_BEEN_SENT, false);
                     message.pinInBackground();
-                    Toast.makeText(this, "Network unavailable, will send when connection is available",
+                    Toast.makeText(this, "Network unavailable, will send message when connection is available",
                             Toast.LENGTH_LONG).show();
                 } else {
                     message.put(ParseConstants.KEY_BEEN_SENT, true);
@@ -109,7 +109,8 @@ public class MessageActivity extends ActionBarActivity {
                                 Toast.LENGTH_LONG).show();
                         sendPushNotifications();
                     } else {
-                        Log.e(TAG, e.getMessage());
+                        mMessage.put(ParseConstants.KEY_BEEN_SENT, false);
+                        mMessage.pinInBackground();
                         Toast.makeText(MessageActivity.this, "Problem sending message: " +
                                 e.getMessage(), Toast.LENGTH_LONG).show();
                     }
