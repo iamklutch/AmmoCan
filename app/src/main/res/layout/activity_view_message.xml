@@ -1,83 +1,87 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                 android:paddingTop="@dimen/activity_vertical_margin"
-                 android:paddingBottom="@dimen/activity_vertical_margin"
-                 android:background="@drawable/bg_ocp_camo"
-                tools:context="com.yukidev.ammocan.ui.ViewMessageActivity">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayout5"
-        style="@style/TextLinearLayout"
-        android:layout_weight="1"
-        android:layout_marginTop="4dp">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                     android:paddingTop="@dimen/activity_vertical_margin"
+                     android:paddingBottom="@dimen/activity_vertical_margin"
+                     android:background="@drawable/bg_ocp_camo"
+                    tools:context="com.yukidev.ammocan.ui.ViewMessageActivity">
 
-        <TextView
-            android:id="@+id/createdOnTextView"
-            android:hint="Date"
-            style="@style/EditText"/>
+        <LinearLayout
+            android:id="@+id/linearLayout5"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/createdOnTextView"
+                android:hint="Date"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout4"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/titleTextView"
+                android:text="Title"
+                style="@style/EditText"/>
+            <requestFocus />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            style="@style/TextLinearLayout"
+            android:layout_weight="6"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/actionTextView"
+                android:hint="Action"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            style="@style/TextLinearLayout"
+            android:layout_weight="6"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/resultTextView"
+                android:hint="Result"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            style="@style/TextLinearLayout"
+            android:layout_weight="6"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/impactTextView"
+                android:hint="Impact"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout4"
-        style="@style/TextLinearLayout"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/titleTextView"
-            android:text="Title"
-            style="@style/EditText"/>
-        <requestFocus />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        style="@style/TextLinearLayout"
-        android:layout_weight="6"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/actionTextView"
-            android:hint="Action"
-            android:scrollbars="vertical"
-            style="@style/EditText"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        style="@style/TextLinearLayout"
-        android:layout_weight="6"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/resultTextView"
-            android:hint="Result"
-            android:scrollbars="vertical"
-            style="@style/EditText"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        style="@style/TextLinearLayout"
-        android:layout_weight="6"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/impactTextView"
-            android:hint="Impact"
-            android:scrollbars="vertical"
-            style="@style/EditText"/>
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>

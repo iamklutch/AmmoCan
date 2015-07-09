@@ -39,10 +39,14 @@ public class FriendsFragment extends Fragment {
     protected ParseUser mCurrentUser;
     protected GridView mGridView;
     protected ImageButton mSendButton;
+    private Boolean mNetCheck;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View rootView = inflater.inflate(R.layout.user_grid, container, false);
+
+        Bundle args = getArguments();
+        mNetCheck = args.getBoolean("netCheck");
 
         mGridView = (GridView)rootView.findViewById(R.id.friendsGrid);
 
@@ -75,53 +79,89 @@ public class FriendsFragment extends Fragment {
         mCurrentUser = ParseUser.getCurrentUser();
         mFriendRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
-        ParseSession.getCurrentSessionInBackground();
+        if (!mNetCheck) {
+            //Offline
+            ParseQuery<ParseUser> query = mFriendRelation.getQuery();
+            query.addAscendingOrder(ParseConstants.KEY_USERNAME);
+            query.fromLocalDatastore();
+            query.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> friends, ParseException e) {
+                    if (e == null) {
+                        mFriends = friends;
+                        String[] usernames = new String[mFriends.size()];
+                        int i = 0;
+                        for (ParseUser user : mFriends) {
+                            usernames[i] = user.getUsername();
+                            i++;
+                        }
+                        if (mGridView.getAdapter() == null) {
+                            UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
+                            mGridView.setAdapter(adapter);
+                        } else {
+                            ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
+                        }
+                    } else {
+                        Log.e(TAG, e.getMessage());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage(e.getMessage())
+                                .setTitle(R.string.error_title)
+                                .setPositiveButton(android.R.string.ok, null);
 
-        ParseQuery<ParseUser> query =  mFriendRelation.getQuery();
-        query.addAscendingOrder(ParseConstants.KEY_USERNAME);
-        query.findInBackground(new FindCallback<ParseUser>() {
-            @Override
-            public void done(List<ParseUser> friends, ParseException e) {
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
 
-                if (e == null) {
-
-                    mFriends = friends;
-
-                    if (mFriends.size() == 0) {
-                        Toast.makeText(getActivity(), getString(R.string.add_friends_toast_label), Toast.LENGTH_LONG).show();
                     }
-
-                    String[] usernames = new String[mFriends.size()];
-                    int i = 0;
-                    for (ParseUser user : mFriends) {
-                        usernames[i] = user.getUsername();
-                        i++;
-                    }
-                    if (mGridView.getAdapter() == null) {
-                        UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
-                        mGridView.setAdapter(adapter);
-                    }else {
-                        ((UserAdapter)mGridView.getAdapter()).refill(mFriends);
-                    }
-
-
-                } else if (e.getMessage().equals("java.lang.ClassCastException: " +
-                        "java.lang.String cannot be cast to org.json.JSONObject")) {
-                    // Do nothing because this is a parse.com error
-
-                }else {
-                    Log.e(TAG, e.getMessage());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage(e.getMessage())
-                            .setTitle(R.string.error_title)
-                            .setPositiveButton(android.R.string.ok, null);
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
                 }
-            }
-        });
+            });
+        } else {
+            //Online
+            ParseSession.getCurrentSessionInBackground();
+            ParseQuery<ParseUser> query = mFriendRelation.getQuery();
+            query.addAscendingOrder(ParseConstants.KEY_USERNAME);
+            query.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> friends, ParseException e) {
+                    if (e == null) {
+                        ParseUser.pinAllInBackground(friends);
+                        mFriends = friends;
+
+                        if (mFriends.size() == 0) {
+                            Toast.makeText(getActivity(), getString(R.string.add_friends_toast_label), Toast.LENGTH_LONG).show();
+                        }
+
+                        String[] usernames = new String[mFriends.size()];
+                        int i = 0;
+                        for (ParseUser user : mFriends) {
+                            usernames[i] = user.getUsername();
+                            i++;
+                        }
+                        if (mGridView.getAdapter() == null) {
+                            UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
+                            mGridView.setAdapter(adapter);
+                        } else {
+                            ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
+                        }
+
+
+                    } else if (e.getMessage().equals("java.lang.ClassCastException: " +
+                            "java.lang.String cannot be cast to org.json.JSONObject")) {
+                        // Do nothing because this is a parse.com error
+
+                    } else {
+                        Log.e(TAG, e.getMessage());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage(e.getMessage())
+                                .setTitle(R.string.error_title)
+                                .setPositiveButton(android.R.string.ok, null);
+
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
+                    }
+                }
+            });
+        }
 
     }
 

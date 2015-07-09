@@ -72,14 +72,16 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
                     .placeholder(R.drawable.avatar_empty)
                     .into(holder.userImageView);
         }
-
-        if (ParseUser.getCurrentUser().getString(ParseConstants.KEY_SUPERVISOR_ID).equals(supervisor)) {
-            holder.supervisorImageView.setImageResource(R.drawable.avatar_supervisor);
-            holder.supervisorImageView.setVisibility(View.VISIBLE);
-        } else {
+        try {
+            if (ParseUser.getCurrentUser().getString(ParseConstants.KEY_SUPERVISOR_ID).equals(supervisor)) {
+                holder.supervisorImageView.setImageResource(R.drawable.avatar_supervisor);
+                holder.supervisorImageView.setVisibility(View.VISIBLE);
+            } else {
+                holder.supervisorImageView.setVisibility(View.INVISIBLE);
+            }
+        } catch (NullPointerException e) {
             holder.supervisorImageView.setVisibility(View.INVISIBLE);
         }
-
         holder.nameLabel.setText(user.getUsername());
         holder.lastNameLabel.setText(user.getString(ParseConstants.KEY_LASTNAME));
         holder.squadronLabel.setText(user.getString(ParseConstants.KEY_SQUADRON));

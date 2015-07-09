@@ -44,7 +44,8 @@
     <string name="success_message">Message sent!</string>
     <string name="error_sending_message">There was an error sending your message.  Please try again.</string>
     <string name="sorry">We/\'re sorry!</string>
-    <string name="push_message">You have a new AmmoCan bullet from %s!</string>
+    <string name="bullet_push_message">You have a new AmmoCan bullet from %s!</string>
+    <string name="request_push_message">You have a new user add request from %s!</string>
     <string name="search_title">Search</string>
     <string name="bullet_title">Bullet Title</string>
 

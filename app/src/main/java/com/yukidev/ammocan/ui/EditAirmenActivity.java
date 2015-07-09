@@ -22,6 +22,9 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -211,17 +214,40 @@ public class EditAirmenActivity extends ActionBarActivity {
     }
     protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
             ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
+            checkImageView.setImageResource(R.drawable.avatar_request_pending);
+            checkImageView.setVisibility(View.VISIBLE);
 
             if (mGridView.isItemChecked(position)){
-                //  add friend
-                mFriendRelation.add(mUsers.get(position));
-                checkImageView.setVisibility(View.VISIBLE);
+                ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
+                request.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+                request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
+                request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
+                request.put(ParseConstants.KEY_REQUEST_TYPE, "Airman");
+                request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
+                request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
+                        " wants to add you!");
+                request.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            sendAddUserPushNotification(mUsers.get(position).getObjectId());
+                            Toast.makeText(EditAirmenActivity.this, "Request sent",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(EditAirmenActivity.this,
+                                    "Problem sending request, please try later",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+//                }
             }
             else {
                 // remove friend
                 mFriendRelation.remove(mUsers.get(position));
+                mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
                 checkImageView.setVisibility(View.INVISIBLE);
             }
 
@@ -237,6 +263,16 @@ public class EditAirmenActivity extends ActionBarActivity {
                 }
             });
 
+        }
+
+        protected void sendAddUserPushNotification(String targetID) {
+            ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+            query.whereContains(ParseConstants.KEY_USER_ID, targetID);
+
+            ParsePush push = new ParsePush();
+            push.setQuery(query);
+            push.setMessage(getString(R.string.request_push_message, ParseUser.getCurrentUser().getUsername()));
+            push.sendInBackground();
         }
     };
 }

@@ -17,7 +17,6 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     public void onPushOpen(Context context, Intent intent) {
-        Log.e("Push", "Clicked");
         Intent notificationIntent = new Intent();
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP |

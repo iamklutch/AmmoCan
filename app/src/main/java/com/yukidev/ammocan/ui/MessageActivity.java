@@ -25,7 +25,6 @@ import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.DateHelper;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
@@ -107,7 +106,7 @@ public class MessageActivity extends ActionBarActivity {
                         //success
                         Toast.makeText(MessageActivity.this, getString(R.string.success_message),
                                 Toast.LENGTH_LONG).show();
-                        sendPushNotifications();
+                        sendMessagePushNotifications();
                     } else {
                         mMessage.put(ParseConstants.KEY_BEEN_SENT, false);
                         mMessage.pinInBackground();
@@ -129,7 +128,7 @@ public class MessageActivity extends ActionBarActivity {
                             //success
                             Toast.makeText(MessageActivity.this, getString(R.string.success_message),
                                     Toast.LENGTH_LONG).show();
-                            sendPushNotifications();
+                            sendMessagePushNotifications();
                         } else {
                             Log.e(TAG, e.getMessage());
                             Toast.makeText(MessageActivity.this, "Problem sending message: " +
@@ -165,6 +164,7 @@ public class MessageActivity extends ActionBarActivity {
         message.put(ParseConstants.KEY_IMPACT, encryptedImpact);
         message.put(ParseConstants.KEY_CREATED_ON, date);
         message.put(ParseConstants.KEY_VIEWED, false);
+        message.put(ParseConstants.KEY_MESSAGE_TYPE, "bullet");
 
             return message;
     }
@@ -176,13 +176,13 @@ public class MessageActivity extends ActionBarActivity {
         return supervisorID;
     }
 
-    protected void sendPushNotifications() {
+    protected void sendMessagePushNotifications() {
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
         query.whereContains(ParseConstants.KEY_USER_ID, getSupervisorIds());
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
-        push.setMessage(getString(R.string.push_message, ParseUser.getCurrentUser().getUsername()));
+        push.setMessage(getString(R.string.bullet_push_message, ParseUser.getCurrentUser().getUsername()));
         push.sendInBackground();
 
     }

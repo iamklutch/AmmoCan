@@ -1,8 +1,11 @@
 package com.yukidev.ammocan.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -22,10 +25,13 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseSession;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
@@ -39,6 +45,8 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    protected ParseRelation<ParseUser> mFriendRelation;
+    private ParseUser mCurrentUser;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -58,27 +66,30 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-
         setContentView(R.layout.activity_main);
 
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("netCheck", isNetworkAvailable());
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager(), bundle);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        mCurrentUser = ParseUser.getCurrentUser();
 
-        if(currentUser == null) {
+        if(mCurrentUser == null) {
             navigateToLogin();
         }
         else {
             messageUpdater();
+//            checkAddUserRequests();
         }
+
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -240,23 +251,31 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             @Override
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < list.size(); i++) {
-                        ParseObject currentMessage = list.get(i);
-                        currentMessage.put(ParseConstants.KEY_BEEN_SENT, true);
-                        currentMessage.put(ParseConstants.KEY_VIEWED, true);
-                        currentMessage.saveEventually(new SaveCallback() {
-                            @Override
-                            public void done(ParseException f) {
-                                if (f == null) {
+                    if (!isNetworkAvailable()) {
+                        // no network so don't try to send message.
+                        Toast.makeText(MainActivity.this,
+                                "Internet connection unavailable",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        for (int i = 0; i < list.size(); i++) {
+                            ParseObject currentMessage = list.get(i);
+                            currentMessage.put(ParseConstants.KEY_BEEN_SENT, true);
+                            currentMessage.put(ParseConstants.KEY_VIEWED, true);
+                            currentMessage.saveEventually(new SaveCallback() {
+                                @Override
+                                public void done(ParseException f) {
+                                    if (f == null) {
 
-                                } else {
-                                    Toast.makeText(MainActivity.this,
-                                            "Background message update failed",
-                                            Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this,
+                                                "Background message update failed",
+                                                Toast.LENGTH_LONG).show();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
+
                 } else {
                     Toast.makeText(MainActivity.this,
                             "Stored messages unavailable",
@@ -267,4 +286,67 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         });
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        boolean isAvailable = false;
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            isAvailable = true;
+        }
+        return isAvailable;
+    }
+
+//    private void checkAddUserRequests(){
+//        ParseQuery<ParseObject> requestQuery = new ParseQuery<>(ParseConstants.CLASS_USER_REQUEST);
+//        requestQuery.whereEqualTo(ParseConstants.KEY_TARGET_USER,
+//                ParseUser.getCurrentUser().getObjectId());
+//        requestQuery.findInBackground(new FindCallback<ParseObject>() {
+//            @Override
+//            public void done(List<ParseObject> requests, ParseException e) {
+//                if (!requests.isEmpty()) {
+//
+//                    for (final ParseObject request : requests) {
+//
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                        builder.setTitle("New request from " +
+//                                request.get(ParseConstants.KEY_REQUESTER_USERNAME));
+//                        builder.setMessage(request.get(ParseConstants.KEY_REQUESTER_USERNAME) +
+//                                " wants to add you as their " +
+//                                request.get(ParseConstants.KEY_REQUEST_TYPE));
+//                        builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+//                                userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
+//                                        request.get(ParseConstants.KEY_REQUESTER_ID));
+//                                userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+//                                    @Override
+//                                    public void done(ParseUser parseUser, ParseException e) {
+//                                        if (e == null) {
+//                                            mFriendRelation = mCurrentUser.
+//                                                    getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+//                                            mFriendRelation.add(parseUser);
+//                                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, request.
+//                                                    get(ParseConstants.KEY_REQUESTER_ID));
+//                                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_USERNAME, request.
+//                                                    get(ParseConstants.KEY_REQUESTER_USERNAME));
+//                                            request.deleteInBackground();
+//                                            mCurrentUser.saveInBackground();
+//                                        } else {
+//
+//                                        }
+//                                    }
+//                                });
+//                            }
+//                        });
+//                        builder.setNegativeButton("CANCEL", null);
+//                        builder.create().show();
+//                    }
+//                }
+//            }
+//        });
+//
+//
+//    }
 }

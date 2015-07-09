@@ -60,7 +60,12 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> {
                 getTime(), now, DateUtils.SECOND_IN_MILLIS).toString();
 
         holder.timeLabel.setText(convertedDate);
-        holder.iconImageView.setImageResource(R.drawable.bullets);
+        if (message.get(ParseConstants.KEY_MESSAGE_TYPE).equals(ParseConstants.MESSAGE_TYPE_BULLET)){
+            holder.iconImageView.setImageResource(R.drawable.bullets);
+        } else {
+            holder.iconImageView.setImageResource(R.drawable.ic_action_add_group);
+        }
+
         holder.nameLabel.setText(message.getString(ParseConstants.KEY_SENDER_NAME));
         holder.bulletTitleLabel.setText(message.getString(ParseConstants.KEY_BULLET_TITLE));
         return convertView;

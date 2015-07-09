@@ -17,13 +17,18 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.MessageAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
+
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
@@ -38,10 +43,21 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     protected List<ParseObject> mMessages;
     protected SwipeRefreshLayout mSwipeRefreshLayout;
     private ProgressBar mProgressBar;
+    private Boolean mNetCheck;
+    protected ParseRelation<ParseUser> mFriendRelation;
+    private ParseUser mCurrentUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
+        try {
+            Bundle args = getArguments();
+            mNetCheck = args.getBoolean("netCheck");
+        } catch (NullPointerException e) {
+
+        }
+
+        mCurrentUser = ParseUser.getCurrentUser();
 
         mSwipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
         mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
@@ -72,50 +88,65 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     }
 
     private void retrieveMessages() {
-        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
-        query.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, ParseUser.getCurrentUser().getObjectId());
-        query.whereEqualTo(ParseConstants.KEY_VIEWED, false);
-        query.addAscendingOrder(ParseConstants.KEY_CREATED_ON);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> messages, ParseException e) {
-                // set progress bar invisible
-                mProgressBar.setVisibility(View.INVISIBLE);
+        if (!mNetCheck) {
+            Toast.makeText(getActivity(), "Network unavailable", Toast.LENGTH_LONG).show();
+        } else {
 
-                if (mSwipeRefreshLayout.isRefreshing()) {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
+            ParseQuery<ParseObject> query1 = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+            query1.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, ParseUser.getCurrentUser().getObjectId());
+            query1.whereEqualTo(ParseConstants.KEY_VIEWED, false);
 
-                if (e == null) {
-                    //success
-                    mMessages = messages;
-                    ParseObject.pinAllInBackground(ParseConstants.CLASS_MESSAGES, messages);
-                    String[] usernames = new String[mMessages.size()];
-                    int i = 0;
-                    try {
-                        for (ParseObject message : mMessages) {
-                            try {
-                                usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
-                                i++;
+            ParseQuery<ParseObject> query2 = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+            query2.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
+            query2.whereEqualTo(ParseConstants.KEY_TARGET_USER, mCurrentUser.getObjectId());
+
+            List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<ParseQuery<ParseObject>>();
+            bothQuerys.add(query1);
+            bothQuerys.add(query2);
+
+            ParseQuery<ParseObject> mainQuery = ParseQuery.or(bothQuerys);
+            mainQuery.addAscendingOrder(ParseConstants.KEY_CREATED_ON);
+            mainQuery.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> messages, ParseException e) {
+                    // set progress bar invisible
+                    mProgressBar.setVisibility(View.INVISIBLE);
+
+                    if (mSwipeRefreshLayout.isRefreshing()) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    if (e == null) {
+                        //success
+                        mMessages = messages;
+                        ParseObject.pinAllInBackground(ParseConstants.CLASS_MESSAGES, messages);
+                        String[] usernames = new String[mMessages.size()];
+                        int i = 0;
+                        try {
+                            for (ParseObject message : mMessages) {
+                                try {
+                                    usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                                    i++;
                                     if (getListView().getAdapter() == null) {
                                         MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
                                         setListAdapter(adapter);
                                     } else {
                                         ((MessageAdapter) getListView().getAdapter()).refill(mMessages);
                                     }
-                            } catch (IllegalStateException ise) {
-                                Log.d(TAG, "Content view not yet created" + ise.getMessage());
-                            }
+                                } catch (IllegalStateException ise) {
+                                    Log.d(TAG, "Content view not yet created" + ise.getMessage());
+                                }
 
+                            }
+                        } catch (ConcurrentModificationException ccm) {
+                            Log.d(TAG, "Caught exception: " + ccm.getMessage());
                         }
-                    } catch (ConcurrentModificationException ccm) {
-                        Log.d(TAG, "Caught exception: " + ccm.getMessage());
+
                     }
 
                 }
-
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -125,11 +156,11 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Delete Bullet?");
+                builder.setTitle("Delete Request/Bullet?");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "Bullet deleted", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Request/Bullet deleted", Toast.LENGTH_LONG).show();
                         ParseObject message = mMessages.get(position);
                         message.deleteInBackground();
                         MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
@@ -151,11 +182,67 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        ParseObject message = mMessages.get(position);
+        final ParseObject message = mMessages.get(position);
+        final View mView = v;
+        if (message.get(ParseConstants.KEY_MESSAGE_TYPE) == ParseConstants.MESSAGE_TYPE_BULLET) {
+            Intent intent = new Intent(getActivity(), ViewMessageActivity.class);
+            intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
+            intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
+            startActivity(intent);
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("New request from " +
+                    message.get(ParseConstants.KEY_SENDER_NAME));
+            builder.setMessage(message.get(ParseConstants.KEY_SENDER_NAME) +
+                    " wants to add you as their " +
+                    message.get(ParseConstants.KEY_REQUEST_TYPE));
+            builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                    userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
+                            message.get(ParseConstants.KEY_SENDER_ID));
+                    userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                        @Override
+                        public void done(ParseUser parseUser, ParseException e) {
+                            if (e == null) {
+                                mFriendRelation = mCurrentUser.
+                                        getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+                                mFriendRelation.add(parseUser);
+                                if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor")) {
+                                    mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, message.
+                                            get(ParseConstants.KEY_SENDER_ID));
+                                    mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_USERNAME, message.
+                                            get(ParseConstants.KEY_SENDER_NAME));
+                                }
+                                mCurrentUser.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            message.deleteInBackground();
 
-        Intent intent = new Intent(getActivity(), ViewMessageActivity.class);
-        intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
-        intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
-        startActivity(intent);
+                                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                            mView.setVisibility(View.GONE);
+                                            adapter.remove(message);
+                                            adapter.notifyDataSetChanged();
+                                        } else {
+                                            // don't delete user request
+                                        }
+                                    }
+                                });
+
+
+                            } else {
+                                //  couldn't get user to add
+                            }
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton("CANCEL", null);
+            builder.create().show();
+        }
+
+
     }
 }
