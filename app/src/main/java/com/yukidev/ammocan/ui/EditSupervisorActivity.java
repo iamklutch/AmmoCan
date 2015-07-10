@@ -49,10 +49,11 @@ public class EditSupervisorActivity extends ActionBarActivity {
     protected ParseRelation<ParseUser> mFriendRelation;
     protected ParseUser mCurrentUser;
     protected GridView mGridView;
-    protected ImageButton mSendButton;
     protected String mUnitSearchVariable;
     protected String mLastNameSearchVariable;
     protected String mUsernameSearchVariable;
+    protected int mPosition;
+    private View mView;
 
 
     @InjectView(R.id.userGridProgressBar)ProgressBar mProgressBar;
@@ -60,7 +61,6 @@ public class EditSupervisorActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.user_grid);
         ButterKnife.inject(this);
 
@@ -73,9 +73,6 @@ public class EditSupervisorActivity extends ActionBarActivity {
 
         TextView emptyTextView = (TextView)findViewById(android.R.id.empty);
         mGridView.setEmptyView(emptyTextView);
-
-        mSendButton = (ImageButton)findViewById(R.id.userGridImageButton);
-        mSendButton.setVisibility(View.INVISIBLE);
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.show();
@@ -214,13 +211,16 @@ public class EditSupervisorActivity extends ActionBarActivity {
 
     protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
-
-            if (mGridView.isItemChecked(position)){
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+           final ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
+            final ImageView supImageView = (ImageView)view.findViewById(R.id.supervisorImageView);
+            mView = view;
+            mPosition = position;
+            if (mGridView.isItemChecked(mPosition)){
                 //  add friend
                 checkImageView.setImageResource(R.drawable.avatar_request_pending);
                 checkImageView.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
                     ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
                     request.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
                     request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
@@ -234,10 +234,12 @@ public class EditSupervisorActivity extends ActionBarActivity {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                sendAddUserPushNotification(mUsers.get(position).getObjectId());
+                                mProgressBar.setVisibility(View.INVISIBLE);
+                                sendAddUserPushNotification(mUsers.get(mPosition).getObjectId());
                                 Toast.makeText(EditSupervisorActivity.this, "Request sent",
                                         Toast.LENGTH_LONG).show();
                             } else {
+                                mProgressBar.setVisibility(View.INVISIBLE);
                                 Toast.makeText(EditSupervisorActivity.this,
                                         "Problem sending request, please try later",
                                         Toast.LENGTH_LONG).show();
@@ -248,23 +250,24 @@ public class EditSupervisorActivity extends ActionBarActivity {
             }
             else {
                 // remove friend
-                mFriendRelation.remove(mUsers.get(position));
-                mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
-                checkImageView.setVisibility(View.INVISIBLE);
-            }
-
-            mCurrentUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    if (e == null) {
-
-                    } else {
-
-                        Toast.makeText(EditSupervisorActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditSupervisorActivity.this);
+                builder.setTitle("Remove as Supervisor?");
+                builder.setMessage("Click OK to remove this person as your supervisor");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mUsers.get(mPosition).unpinInBackground();
+                        mFriendRelation.remove(mUsers.get(mPosition));
+                        mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
+                        checkImageView.setVisibility(View.INVISIBLE);
+                        supImageView.setVisibility(View.INVISIBLE);
+                        mView.setVisibility(View.GONE);
+                        mCurrentUser.saveInBackground();
                     }
-                }
-            });
-
+                });
+                builder.setNegativeButton("CANCEL", null);
+                builder.create().show();
+            }
         }
 
         protected void sendAddUserPushNotification(String targetID) {
@@ -278,8 +281,8 @@ public class EditSupervisorActivity extends ActionBarActivity {
         }
 
         private Boolean alreadyRequested(String targetID) {
-            ParseQuery<ParseObject> checkRequests =
-                    new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+
+            ParseQuery<ParseObject> checkRequests = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
             checkRequests.whereEqualTo(ParseConstants.KEY_SENDER_ID,
                     ParseUser.getCurrentUser().getObjectId());
             checkRequests.whereEqualTo(ParseConstants.KEY_TARGET_USER,
@@ -289,7 +292,8 @@ public class EditSupervisorActivity extends ActionBarActivity {
             try {
                 List<ParseObject> req = checkRequests.find();
                 if (!req.isEmpty()) {
-                    Toast.makeText(EditSupervisorActivity.this, "You already have a pending request with this user",
+                    Toast.makeText(EditSupervisorActivity.this,
+                            "You already have a pending request with this user",
                             Toast.LENGTH_LONG).show();
                     return true;
                 } else {

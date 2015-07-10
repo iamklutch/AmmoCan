@@ -50,8 +50,8 @@
     <string name="bullet_title">Bullet Title</string>
 
     <array name="supervisor_airmen">
-        <item name="find_supervisor">Find your Supervisor</item>
-        <item name="find_airmen">Find your Airmen</item>
+        <item name="find_supervisor">Add/Remove your Supervisor</item>
+        <item name="find_airmen">Add/Remove your Airmen</item>
     </array>
 
     <string name="title_activity_view_message">View Bullet</string>

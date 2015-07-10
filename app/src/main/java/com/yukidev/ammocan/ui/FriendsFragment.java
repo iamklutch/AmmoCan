@@ -1,5 +1,6 @@
 package com.yukidev.ammocan.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,7 +39,6 @@ public class FriendsFragment extends Fragment {
     protected ParseRelation<ParseUser> mFriendRelation;
     protected ParseUser mCurrentUser;
     protected GridView mGridView;
-    protected ImageButton mSendButton;
     private Boolean mNetCheck;
 
     @Override
@@ -48,24 +48,28 @@ public class FriendsFragment extends Fragment {
         Bundle args = getArguments();
         mNetCheck = args.getBoolean("netCheck");
 
+        mCurrentUser = ParseUser.getCurrentUser();
+
         mGridView = (GridView)rootView.findViewById(R.id.friendsGrid);
 
         TextView emptyTextView = (TextView)rootView.findViewById(android.R.id.empty);
         mGridView.setEmptyView(emptyTextView);
 
-        mSendButton = (ImageButton)rootView.findViewById(R.id.userGridImageButton);
-        mSendButton.setVisibility(View.INVISIBLE);
-
-
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_LONG).show();
-                ParseUser clickedUser = mFriends.get(position);
-                String clickedId = clickedUser.getObjectId();
-                Intent intent = new Intent(getActivity(), AirmanBulletsActivity.class);
-                intent.putExtra("objectId", clickedId);
-                startActivity(intent);
+
+                if (mFriends.get(position).getObjectId().
+                        equals(mCurrentUser.get(ParseConstants.KEY_SUPERVISOR_ID))){
+                    // do nothing.
+                } else {
+                    ParseUser clickedUser = mFriends.get(position);
+                    String clickedId = clickedUser.getObjectId();
+                    Intent intent = new Intent(getActivity(), AirmanBulletsActivity.class);
+                    intent.putExtra("objectId", clickedId);
+                    startActivity(intent);
+                }
+
             }
         });
 
@@ -150,13 +154,13 @@ public class FriendsFragment extends Fragment {
 
                     } else {
                         Log.e(TAG, e.getMessage());
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setMessage(e.getMessage())
-                                .setTitle(R.string.error_title)
-                                .setPositiveButton(android.R.string.ok, null);
-
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                        builder.setMessage(e.getMessage())
+//                                .setTitle(R.string.error_title)
+//                                .setPositiveButton(android.R.string.ok, null);
+//
+//                        AlertDialog dialog = builder.create();
+//                        dialog.show();
 
                     }
                 }

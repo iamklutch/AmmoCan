@@ -50,6 +50,7 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
     private void retrieveMessages() {
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
         query.whereEqualTo(ParseConstants.KEY_SENDER_ID, mObjectId);
+        query.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_BULLET);
         query.fromLocalDatastore();
         query.fromPin(ParseConstants.CLASS_MESSAGES);
         query.findInBackground(new FindCallback<ParseObject>() {

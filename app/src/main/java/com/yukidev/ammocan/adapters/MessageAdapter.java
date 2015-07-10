@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,7 @@ import com.yukidev.ammocan.utils.ParseConstants;
 /**
  * Created by James on 5/14/2015.
  */
-public class MessageAdapter extends ArrayAdapter<ParseObject> {
+public class MessageAdapter extends ArrayAdapter<ParseObject> implements Filterable {
 
     protected Context mContext;
     protected List<ParseObject> mMessages;

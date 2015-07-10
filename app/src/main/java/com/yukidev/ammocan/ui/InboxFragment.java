@@ -189,7 +189,41 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
             intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
             startActivity(intent);
-        } else {
+//        } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor")){
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//            builder.setTitle("New request from " +
+//                    message.get(ParseConstants.KEY_SENDER_NAME));
+//            builder.setMessage(message.get(ParseConstants.KEY_SENDER_NAME) +
+//                    " wants to add you as their " +
+//                    message.get(ParseConstants.KEY_REQUEST_TYPE));
+//            builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    String returnID = message.get(ParseConstants.KEY_SENDER_ID).toString();
+//                    message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+//                    message.put(ParseConstants.KEY_TARGET_USER, returnID);
+//                    message.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
+//                            " has accepted your request!");
+//                    message.put(ParseConstants.KEY_REQUEST_TYPE, "ACCEPTED");
+//                    message.saveInBackground(new SaveCallback() {
+//                        @Override
+//                        public void done(ParseException e) {
+//                            if (e == null) {
+//                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+//                                mView.setVisibility(View.GONE);
+//                                adapter.remove(message);
+//                                adapter.notifyDataSetChanged();
+//                            } else {
+//
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//            builder.setNegativeButton("CANCEL", null);
+//            builder.create().show();
+        } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Airman") ||
+                (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor"))){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("New request from " +
                     message.get(ParseConstants.KEY_SENDER_NAME));
@@ -199,48 +233,76 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-                    userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
-                            message.get(ParseConstants.KEY_SENDER_ID));
-                    userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                    String returnID = message.get(ParseConstants.KEY_SENDER_ID).toString();
+                    message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+                    message.put(ParseConstants.KEY_TARGET_USER, returnID);
+                    message.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
+                            " has accepted your request!");
+                    message.put(ParseConstants.KEY_REQUEST_TYPE, "ACCEPTED");
+                    message.saveInBackground(new SaveCallback() {
                         @Override
-                        public void done(ParseUser parseUser, ParseException e) {
+                        public void done(ParseException e) {
                             if (e == null) {
-                                mFriendRelation = mCurrentUser.
-                                        getRelation(ParseConstants.KEY_FRIENDS_RELATION);
-                                mFriendRelation.add(parseUser);
-                                if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor")) {
-                                    mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, message.
-                                            get(ParseConstants.KEY_SENDER_ID));
-                                    mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_USERNAME, message.
-                                            get(ParseConstants.KEY_SENDER_NAME));
-                                }
-                                mCurrentUser.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            message.deleteInBackground();
-
-                                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-                                            mView.setVisibility(View.GONE);
-                                            adapter.remove(message);
-                                            adapter.notifyDataSetChanged();
-                                        } else {
-                                            // don't delete user request
-                                        }
-                                    }
-                                });
-
+//                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+//                                adapter.remove(message);
+//                                adapter.notifyDataSetChanged();
+                                mView.setVisibility(View.GONE);
 
                             } else {
-                                //  couldn't get user to add
+
                             }
                         }
                     });
                 }
             });
-            builder.setNegativeButton("CANCEL", null);
+            builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    message.deleteInBackground();
+//                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+//                    adapter.remove(message);
+//                    adapter.notifyDataSetChanged();
+                    mView.setVisibility(View.GONE);
+                }
+            });
             builder.create().show();
+        } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("ACCEPTED")) {
+            ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+            userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
+                    message.get(ParseConstants.KEY_SENDER_ID));
+            userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                @Override
+                public void done(ParseUser parseUser, ParseException e) {
+                    if (e == null) {
+                        if (!message.get(ParseConstants.KEY_SUPERVISOR_ID).equals(null)){
+                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID,
+                                    message.get(ParseConstants.KEY_SUPERVISOR_ID));
+                        }
+                        mFriendRelation = mCurrentUser.
+                                getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+                        mFriendRelation.add(parseUser);
+                        mCurrentUser.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    message.deleteInBackground();
+//                                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+//                                    adapter.remove(message);
+//                                    adapter.notifyDataSetChanged();
+                                    mView.setVisibility(View.GONE);
+
+                                } else {
+                                    // don't delete user request
+                                }
+                            }
+                        });
+
+
+                    } else {
+                        //  couldn't get user to add
+                    }
+                }
+            });
         }
 
 

@@ -73,9 +73,6 @@ public class EditAirmenActivity extends ActionBarActivity {
         TextView emptyTextView = (TextView)findViewById(android.R.id.empty);
         mGridView.setEmptyView(emptyTextView);
 
-        mSendButton = (ImageButton)findViewById(R.id.userGridImageButton);
-        mSendButton.setVisibility(View.INVISIBLE);
-
         final ActionBar actionBar = getSupportActionBar();
         actionBar.show();
     }
@@ -214,7 +211,7 @@ public class EditAirmenActivity extends ActionBarActivity {
     }
     protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
             checkImageView.setImageResource(R.drawable.avatar_request_pending);
             checkImageView.setVisibility(View.VISIBLE);
@@ -232,7 +229,7 @@ public class EditAirmenActivity extends ActionBarActivity {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
-                            sendAddUserPushNotification(mUsers.get(position).getObjectId());
+//                            sendAddUserPushNotification(mUsers.get(position).getObjectId());
                             Toast.makeText(EditAirmenActivity.this, "Request sent",
                                     Toast.LENGTH_LONG).show();
                         } else {
