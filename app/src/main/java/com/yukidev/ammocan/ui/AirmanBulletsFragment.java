@@ -67,8 +67,8 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
                             usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
                             i++;
 //                            if (getListView().getAdapter() == null) {
-                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-                                setListAdapter(adapter);
+                            MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                            setListAdapter(adapter);
 //                            } else {
 //                                ((MessageAdapter) getListView().getAdapter()).refill(mMessages);
 //                            }
@@ -90,9 +90,21 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_download:
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle(getString(R.string.download_bullets_title));
+                builder.setMessage(getString(R.string.download_bullets_message));
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        downloadMessages();
+                    }
+                });
+                builder.setNegativeButton("CANCEL", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -137,5 +149,46 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
         intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
         intent.putExtra(ParseConstants.LOCAL_STORAGE, true);
         startActivity(intent);
+    }
+
+    public void downloadMessages(){
+
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+        query.whereEqualTo(ParseConstants.KEY_SENDER_ID, mObjectId);
+        query.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_BULLET);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> messages, ParseException e) {
+                if (e == null) {
+                    //success
+                    ParseObject.pinAllInBackground(ParseConstants.CLASS_MESSAGES, messages);
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                    adapter.clear();
+                    adapter.notifyDataSetChanged();
+                    mMessages = messages;
+                    String[] usernames = new String[mMessages.size()];
+                    int i = 0;
+                    try {
+                        for (ParseObject message : mMessages) {
+                            usernames[i] = message.getString(ParseConstants.KEY_SENDER_NAME);
+                            i++;
+                            if (getListView().getAdapter() == null) {
+                                adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                setListAdapter(adapter);
+                            } else {
+                                ((MessageAdapter) getListView().getAdapter()).refill(mMessages);
+                            }
+                        }
+                    } catch (ConcurrentModificationException ccm) {
+                        mProgressBar.setVisibility(View.INVISIBLE);
+                        Log.e(TAG, "ConcurrentMod Exception: " + ccm.getMessage());
+                    }
+
+                }
+            }
+        });
     }
 }

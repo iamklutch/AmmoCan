@@ -32,8 +32,6 @@ public class MessageAdapter extends ArrayAdapter<ParseObject> implements Filtera
 
         mContext = context;
         mMessages = messages;
-
-
     }
 
     @Override

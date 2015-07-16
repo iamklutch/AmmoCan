@@ -33,6 +33,7 @@ import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 import com.yukidev.ammocan.adapters.UserAdapter;
+import com.yukidev.ammocan.utils.PushHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,9 @@ public class EditAirmenActivity extends ActionBarActivity {
     protected List<ParseUser> mUsers;
     protected ParseRelation<ParseUser> mFriendRelation;
     protected ParseUser mCurrentUser;
+    protected int mPosition;
+    private View mView;
     protected GridView mGridView;
-    protected ImageButton mSendButton;
     protected String mUnitSearchVariable;
     protected String mLastNameSearchVariable;
     protected String mUsernameSearchVariable;
@@ -100,12 +102,15 @@ public class EditAirmenActivity extends ActionBarActivity {
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
                 query.whereContains(ParseConstants.KEY_USERNAME, mUsernameSearchVariable);
+                query.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 ParseQuery<ParseUser> query2 = ParseUser.getQuery();
                 query2.whereEqualTo(ParseConstants.KEY_LASTNAME, mLastNameSearchVariable);
+                query2.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 ParseQuery<ParseUser> query3 = ParseUser.getQuery();
                 query3.whereContains(ParseConstants.KEY_SQUADRON, mUnitSearchVariable);
+                query3.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 List<ParseQuery<ParseUser>> allQuerys = new ArrayList<ParseQuery<ParseUser>>();
                 allQuerys.add(query);
@@ -212,9 +217,11 @@ public class EditAirmenActivity extends ActionBarActivity {
     protected AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
+            final ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
             checkImageView.setImageResource(R.drawable.avatar_request_pending);
             checkImageView.setVisibility(View.VISIBLE);
+            mPosition = position;
+            mView = view;
 
             if (mGridView.isItemChecked(position)){
                 ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
@@ -222,6 +229,7 @@ public class EditAirmenActivity extends ActionBarActivity {
                 request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
                 request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
                 request.put(ParseConstants.KEY_REQUEST_TYPE, "Airman");
+                request.put(ParseConstants.KEY_SUPERVISOR_ID, mCurrentUser.getObjectId());
                 request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
                 request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
                         " wants to add you!");
@@ -229,7 +237,10 @@ public class EditAirmenActivity extends ActionBarActivity {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
-//                            sendAddUserPushNotification(mUsers.get(position).getObjectId());
+                            PushHelper push = new PushHelper();
+                            push.sendPushNotification(mUsers.get(mPosition).getObjectId(),
+                                    getString(R.string.request_push_message,
+                                            ParseUser.getCurrentUser().getUsername()));
                             Toast.makeText(EditAirmenActivity.this, "Request sent",
                                     Toast.LENGTH_LONG).show();
                         } else {
@@ -243,9 +254,20 @@ public class EditAirmenActivity extends ActionBarActivity {
             }
             else {
                 // remove friend
-                mFriendRelation.remove(mUsers.get(position));
-                mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
-                checkImageView.setVisibility(View.INVISIBLE);
+                AlertDialog.Builder builder = new AlertDialog.Builder(EditAirmenActivity.this);
+                builder.setTitle("Remove as Supervisor?");
+                builder.setMessage("Click OK to remove this person as your supervisor");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mUsers.get(mPosition).unpinInBackground();
+                        mFriendRelation.remove(mUsers.get(mPosition));
+                        checkImageView.setVisibility(View.INVISIBLE);
+                        mCurrentUser.saveInBackground();
+                    }
+                });
+                builder.setNegativeButton("CANCEL", null);
+                builder.create().show();
             }
 
             mCurrentUser.saveInBackground(new SaveCallback() {

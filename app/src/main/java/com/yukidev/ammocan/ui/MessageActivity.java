@@ -26,6 +26,7 @@ import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.DateHelper;
 import com.yukidev.ammocan.utils.ParseConstants;
+import com.yukidev.ammocan.utils.PushHelper;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -106,7 +107,11 @@ public class MessageActivity extends ActionBarActivity {
                         //success
                         Toast.makeText(MessageActivity.this, getString(R.string.success_message),
                                 Toast.LENGTH_LONG).show();
-                        sendMessagePushNotifications();
+                        PushHelper push = new PushHelper();
+                        push.sendPushNotification(getSupervisorIds(),
+                                getString(R.string.bullet_push_message,
+                                        ParseUser.getCurrentUser().getUsername()));
+//                        sendMessagePushNotifications();
                     } else {
                         mMessage.put(ParseConstants.KEY_BEEN_SENT, false);
                         mMessage.pinInBackground();
@@ -128,9 +133,12 @@ public class MessageActivity extends ActionBarActivity {
                             //success
                             Toast.makeText(MessageActivity.this, getString(R.string.success_message),
                                     Toast.LENGTH_LONG).show();
-                            sendMessagePushNotifications();
+                            PushHelper push = new PushHelper();
+                            push.sendPushNotification(getSupervisorIds(),
+                                    getString(R.string.bullet_push_message,
+                                            ParseUser.getCurrentUser().getUsername()));
+//                            sendMessagePushNotifications();
                         } else {
-                            Log.e(TAG, e.getMessage());
                             Toast.makeText(MessageActivity.this, "Problem sending message: " +
                                     e.getMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -176,16 +184,16 @@ public class MessageActivity extends ActionBarActivity {
         return supervisorID;
     }
 
-    protected void sendMessagePushNotifications() {
-        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        query.whereContains(ParseConstants.KEY_USER_ID, getSupervisorIds());
-
-        ParsePush push = new ParsePush();
-        push.setQuery(query);
-        push.setMessage(getString(R.string.bullet_push_message, ParseUser.getCurrentUser().getUsername()));
-        push.sendInBackground();
-
-    }
+//    protected void sendMessagePushNotifications() {
+//        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+//        query.whereContains(ParseConstants.KEY_USER_ID, getSupervisorIds());
+//
+//        ParsePush push = new ParsePush();
+//        push.setQuery(query);
+//        push.setMessage(getString(R.string.bullet_push_message, ParseUser.getCurrentUser().getUsername()));
+//        push.sendInBackground();
+//
+//    }
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()

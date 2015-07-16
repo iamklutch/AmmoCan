@@ -7,6 +7,10 @@
             android:title="@string/action_logout"
             android:orderInCategory="100"
             app:showAsAction="never"/>
+      <item android:id="@+id/action_edit_account"
+            android:title="Edit Account/Help"
+            android:orderInCategory="1"
+            app:showAsAction="never"/>
       <item android:id="@+id/action_edit_friends"
             android:title="@string/find_supervisor_airmen_menu"
             android:orderInCategory="1"

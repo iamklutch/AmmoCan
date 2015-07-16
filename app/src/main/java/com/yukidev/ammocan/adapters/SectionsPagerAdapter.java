@@ -74,7 +74,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return R.drawable.ic_action_group;
         }
-        return R.drawable.ic_action_maps_my_location;
+        return R.drawable.ic_action_go_to_today;
     }
 }
 

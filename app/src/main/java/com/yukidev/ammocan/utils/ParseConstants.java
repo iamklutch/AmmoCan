@@ -16,6 +16,7 @@ public final class ParseConstants {
     public static final String KEY_USER_ID = "userID";
     public static final String KEY_SUPERVISOR_ID = "supervisorID";
     public static final String KEY_SUPERVISOR_USERNAME = "supUsername";
+    public static final String KEY_DISPLAY_NAME = "displayName";
     public static final String KEY_SQUADRON = "squadron";
     // Message fields
     public static final String KEY_SENDER_ID = "senderId";

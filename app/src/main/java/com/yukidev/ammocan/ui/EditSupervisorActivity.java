@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -31,6 +30,7 @@ import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.UserAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
+import com.yukidev.ammocan.utils.PushHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,12 +101,15 @@ public class EditSupervisorActivity extends ActionBarActivity {
 
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
                 query.whereContains(ParseConstants.KEY_USERNAME, mUsernameSearchVariable);
+                query.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 ParseQuery<ParseUser> query2 = ParseUser.getQuery();
                 query2.whereEqualTo(ParseConstants.KEY_LASTNAME, mLastNameSearchVariable);
+                query2.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 ParseQuery<ParseUser> query3 = ParseUser.getQuery();
                 query3.whereContains(ParseConstants.KEY_SQUADRON, mUnitSearchVariable);
+                query3.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
                 List<ParseQuery<ParseUser>> allQuerys = new ArrayList<ParseQuery<ParseUser>>();
                 allQuerys.add(query);
@@ -221,32 +224,45 @@ public class EditSupervisorActivity extends ActionBarActivity {
                 checkImageView.setImageResource(R.drawable.avatar_request_pending);
                 checkImageView.setVisibility(View.VISIBLE);
                 mProgressBar.setVisibility(View.VISIBLE);
-                    ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
-                    request.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
-                    request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
-                    request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
-                    request.put(ParseConstants.KEY_SUPERVISOR_ID, mUsers.get(position).getObjectId());
-                    request.put(ParseConstants.KEY_REQUEST_TYPE, "Supervisor");
-                    request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
-                    request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
-                            " wants to add you!");
-                    request.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                sendAddUserPushNotification(mUsers.get(mPosition).getObjectId());
-                                Toast.makeText(EditSupervisorActivity.this, "Request sent",
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(EditSupervisorActivity.this,
-                                        "Problem sending request, please try later",
-                                        Toast.LENGTH_LONG).show();
+
+                ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
+                request.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+                request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
+                request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
+                request.put(ParseConstants.KEY_SUPERVISOR_ID, mUsers.get(position).getObjectId());
+                request.put(ParseConstants.KEY_REQUEST_TYPE, "Supervisor");
+                // put this in for inboxFragment to insert supervisorID
+                request.put(ParseConstants.KEY_ACTION, "Supervisor");
+                request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
+                request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
+                        " wants to add you!");
+                request.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            mProgressBar.setVisibility(View.INVISIBLE);
+                            PushHelper push = new PushHelper();
+                            push.sendPushNotification(mUsers.get(mPosition).getObjectId(),
+                                    getString(R.string.request_push_message,
+                                            ParseUser.getCurrentUser().getUsername()));
+                            Toast.makeText(EditSupervisorActivity.this, "Request sent",
+                                    Toast.LENGTH_LONG).show();
+                            try {
+                                wait(1000);
+                            } catch (InterruptedException ie) {
+                                Log.e(TAG, "Interupted Exception: " + ie.getMessage());
                             }
+                            finish();
+                        } else {
+                            mProgressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(EditSupervisorActivity.this,
+                                    "Problem sending request, please try later",
+                                    Toast.LENGTH_LONG).show();
+                            finish();
+                        }
                         }
                     });
-//                }
+//              }
             }
             else {
                 // remove friend
@@ -261,23 +277,12 @@ public class EditSupervisorActivity extends ActionBarActivity {
                         mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
                         checkImageView.setVisibility(View.INVISIBLE);
                         supImageView.setVisibility(View.INVISIBLE);
-                        mView.setVisibility(View.GONE);
                         mCurrentUser.saveInBackground();
                     }
                 });
                 builder.setNegativeButton("CANCEL", null);
                 builder.create().show();
             }
-        }
-
-        protected void sendAddUserPushNotification(String targetID) {
-            ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-            query.whereContains(ParseConstants.KEY_USER_ID, targetID);
-
-            ParsePush push = new ParsePush();
-            push.setQuery(query);
-            push.setMessage(getString(R.string.request_push_message, ParseUser.getCurrentUser().getUsername()));
-            push.sendInBackground();
         }
 
         private Boolean alreadyRequested(String targetID) {

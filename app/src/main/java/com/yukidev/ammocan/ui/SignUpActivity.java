@@ -58,6 +58,7 @@ public class SignUpActivity extends ActionBarActivity {
 
                 if (isNetworkAvailable()) {
 
+                    String displayName = mUsername.getText().toString().trim();
                     String username = mUsername.getText().toString().trim().toLowerCase();
                     String password = mPassword.getText().toString().trim();
                     String password2 = mPassword2.getText().toString().trim();
@@ -90,8 +91,10 @@ public class SignUpActivity extends ActionBarActivity {
                         newUser.setUsername(username);
                         newUser.setPassword(password);
                         newUser.setEmail(email);
+                        newUser.put(ParseConstants.KEY_SUPERVISOR_ID, "none");
                         newUser.put(ParseConstants.KEY_LASTNAME, lastName);
                         newUser.put(ParseConstants.KEY_SQUADRON, squadron);
+                        newUser.put(ParseConstants.KEY_DISPLAY_NAME, displayName);
                         newUser.signUpInBackground(new SignUpCallback() {
                             @Override
                             public void done(ParseException e) {

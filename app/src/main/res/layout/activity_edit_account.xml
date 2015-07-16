@@ -1,0 +1,125 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:paddingLeft="@dimen/activity_horizontal_margin"
+                  android:paddingRight="@dimen/activity_horizontal_margin"
+                  android:paddingTop="@dimen/activity_vertical_margin"
+                  android:paddingBottom="@dimen/activity_vertical_margin"
+                  android:background="@drawable/bg_ocp_camo"
+                  tools:context="com.yukidev.ammocan.ui.ViewMessageActivity">
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/currentUsernameField"
+                android:hint="Username"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp">
+
+            <EditText
+                android:id="@+id/currentUserLastName"
+                android:hint="Last Name"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp">
+
+            <EditText
+                android:id="@+id/currentUserSquadron"
+                android:hint="Squadron"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout4"
+            style="@style/TextLinearLayout"
+            android:layout_weight="1"
+            android:layout_marginTop="4dp">
+
+            <EditText
+                android:id="@+id/currentEmail"
+                android:textSize="16sp"
+                android:hint="@string/current_email"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout5"
+            style="@style/TextLinearLayout"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <EditText
+                android:id="@+id/newPasswordField"
+                android:inputType="textPassword"
+                android:hint="@string/new_password"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                style="@style/EditText"/>
+            <EditText
+                android:id="@+id/newPasswordField2"
+                android:inputType="textPassword"
+                android:hint="@string/password_again_hint"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                style="@style/EditText"/>
+        </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        style="@style/TextLinearLayout"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fill out fields, then press to CHANGE PASSWORD"
+            android:textSize="18sp"
+            style="@style/ButtonStyle"
+            android:id="@+id/changePasswordButton"
+            android:layout_gravity="center_horizontal"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/linearLayout7"
+            style="@style/TextLinearLayout"
+            android:layout_weight="8"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/helpField"
+                android:text="@string/help_text"
+                android:textSize="16sp"
+                style="@style/EditText"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

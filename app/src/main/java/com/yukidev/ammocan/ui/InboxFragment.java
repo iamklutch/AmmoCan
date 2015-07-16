@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -134,12 +135,12 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                                         ((MessageAdapter) getListView().getAdapter()).refill(mMessages);
                                     }
                                 } catch (IllegalStateException ise) {
-                                    Log.d(TAG, "Content view not yet created" + ise.getMessage());
+                                    Log.e(TAG, "Content view not yet created" + ise.getMessage());
                                 }
 
                             }
                         } catch (ConcurrentModificationException ccm) {
-                            Log.d(TAG, "Caught exception: " + ccm.getMessage());
+                            Log.e(TAG, "Caught exception: " + ccm.getMessage());
                         }
 
                     }
@@ -189,39 +190,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
             intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
             startActivity(intent);
-//        } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor")){
-//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//            builder.setTitle("New request from " +
-//                    message.get(ParseConstants.KEY_SENDER_NAME));
-//            builder.setMessage(message.get(ParseConstants.KEY_SENDER_NAME) +
-//                    " wants to add you as their " +
-//                    message.get(ParseConstants.KEY_REQUEST_TYPE));
-//            builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    String returnID = message.get(ParseConstants.KEY_SENDER_ID).toString();
-//                    message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
-//                    message.put(ParseConstants.KEY_TARGET_USER, returnID);
-//                    message.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
-//                            " has accepted your request!");
-//                    message.put(ParseConstants.KEY_REQUEST_TYPE, "ACCEPTED");
-//                    message.saveInBackground(new SaveCallback() {
-//                        @Override
-//                        public void done(ParseException e) {
-//                            if (e == null) {
-//                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-//                                mView.setVisibility(View.GONE);
-//                                adapter.remove(message);
-//                                adapter.notifyDataSetChanged();
-//                            } else {
-//
-//                            }
-//                        }
-//                    });
-//                }
-//            });
-//            builder.setNegativeButton("CANCEL", null);
-//            builder.create().show();
+
         } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Airman") ||
                 (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor"))){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -233,8 +202,45 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Airman")){
+
+                        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                        userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
+                                message.get(ParseConstants.KEY_SENDER_ID));
+                        userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                            @Override
+                            public void done(ParseUser parseUser, ParseException e) {
+                                if (e == null) {
+                                    String supervisorID = message.get
+                                            (ParseConstants.KEY_SUPERVISOR_ID).toString();
+                                    mFriendRelation = mCurrentUser.
+                                            getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+                                    mFriendRelation.add(parseUser);
+                                    mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID,
+                                            supervisorID);
+                                    mCurrentUser.saveEventually();
+                                }
+                            }
+                        });
+                    } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor")){
+                        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+                        userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
+                                message.get(ParseConstants.KEY_SENDER_ID));
+                        userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+                            @Override
+                            public void done(ParseUser parseUser, ParseException e) {
+                                if (e == null) {
+                                    mFriendRelation = mCurrentUser.
+                                            getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+                                    mFriendRelation.add(parseUser);
+                                    mCurrentUser.saveEventually();
+                                }
+                            }
+                        });
+                    }
                     String returnID = message.get(ParseConstants.KEY_SENDER_ID).toString();
                     message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+                    message.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
                     message.put(ParseConstants.KEY_TARGET_USER, returnID);
                     message.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
                             " has accepted your request!");
@@ -243,9 +249,9 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-//                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-//                                adapter.remove(message);
-//                                adapter.notifyDataSetChanged();
+                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                adapter.remove(message);
+                                adapter.notifyDataSetChanged();
                                 mView.setVisibility(View.GONE);
 
                             } else {
@@ -259,9 +265,9 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     message.deleteInBackground();
-//                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-//                    adapter.remove(message);
-//                    adapter.notifyDataSetChanged();
+                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                    adapter.remove(message);
+                    adapter.notifyDataSetChanged();
                     mView.setVisibility(View.GONE);
                 }
             });
@@ -274,7 +280,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                 @Override
                 public void done(ParseUser parseUser, ParseException e) {
                     if (e == null) {
-                        if (!message.get(ParseConstants.KEY_SUPERVISOR_ID).equals(null)){
+                        if (!message.get(ParseConstants.KEY_ACTION).equals("Supervisor")){
                             mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID,
                                     message.get(ParseConstants.KEY_SUPERVISOR_ID));
                         }
@@ -286,9 +292,9 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                             public void done(ParseException e) {
                                 if (e == null) {
                                     message.deleteInBackground();
-//                                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-//                                    adapter.remove(message);
-//                                    adapter.notifyDataSetChanged();
+                                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                    adapter.remove(message);
+                                    adapter.notifyDataSetChanged();
                                     mView.setVisibility(View.GONE);
 
                                 } else {

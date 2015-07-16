@@ -143,16 +143,25 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ParseUser.logOut();
                 navigateToLogin();
                 break;
+            case R.id.action_edit_account:
+                Intent intent = new Intent(this, EditAccount.class);
+                startActivity(intent);
+                break;
+
             case R.id.action_edit_friends:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setItems(R.array.supervisor_airmen, mDialogListener);
                 AlertDialog dialog = builder.create();
                 dialog.show();
-
                 break;
             case R.id.action_message:
-                Intent intent = new Intent(this, MessageActivity.class);
-                startActivity(intent);
+                if (mCurrentUser.get(ParseConstants.KEY_SUPERVISOR_ID).equals("none")){
+                    Toast.makeText(this, "Please add a supervisor first!", Toast.LENGTH_LONG).show();
+                } else {
+                    intent = new Intent(this, MessageActivity.class);
+                    startActivity(intent);
+                }
+
                 break;
         }
 
