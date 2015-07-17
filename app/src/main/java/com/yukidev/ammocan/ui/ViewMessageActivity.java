@@ -1,11 +1,14 @@
 package com.yukidev.ammocan.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +18,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.DateHelper;
@@ -77,12 +81,21 @@ public class ViewMessageActivity extends ActionBarActivity {
                     "Problem retrieveing message: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
+
+        mMessage.put(ParseConstants.KEY_VIEWED, true);
+        mMessage.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                }
+            }
+        });
     }
 
     private ParseObject getMessage (String objectId) throws ParseException {
         ParseObject message;
         ParseQuery<ParseObject> query = ParseQuery.getQuery(ParseConstants.CLASS_MESSAGES);
-        if (mStorage == true) {
+        if (mStorage) {
             message = query.fromLocalDatastore().get(objectId);
         } else {
             message = query.get(objectId);
@@ -107,9 +120,21 @@ public class ViewMessageActivity extends ActionBarActivity {
 
         switch (id) {
             case R.id.action_delete:
-                mMessage.deleteInBackground();
-                Toast.makeText(this, "Bullet deleted", Toast.LENGTH_LONG).show();
-                finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Delete Bullet?");
+                builder.setMessage("This will completely delete this bullet!  There is no Undo . . .");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMessage.deleteInBackground();
+                        Toast.makeText(ViewMessageActivity.this,
+                                "Bullet deleted", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+                builder.create().show();
+
                 break;
         }
 

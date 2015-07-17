@@ -250,7 +250,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         query2.fromLocalDatastore();
         query2.whereEqualTo(ParseConstants.KEY_BEEN_SENT, false);
 
-        List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<ParseQuery<ParseObject>>();
+        List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<>();
         bothQuerys.add(query1);
         bothQuerys.add(query2);
 
@@ -269,7 +269,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                         for (int i = 0; i < list.size(); i++) {
                             ParseObject currentMessage = list.get(i);
                             currentMessage.put(ParseConstants.KEY_BEEN_SENT, true);
-                            currentMessage.put(ParseConstants.KEY_VIEWED, true);
+//                            currentMessage.put(ParseConstants.KEY_VIEWED, true);
                             currentMessage.saveEventually(new SaveCallback() {
                                 @Override
                                 public void done(ParseException f) {

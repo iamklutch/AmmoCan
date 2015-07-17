@@ -111,7 +111,6 @@ public class MessageActivity extends ActionBarActivity {
                         push.sendPushNotification(getSupervisorIds(),
                                 getString(R.string.bullet_push_message,
                                         ParseUser.getCurrentUser().getUsername()));
-//                        sendMessagePushNotifications();
                     } else {
                         mMessage.put(ParseConstants.KEY_BEEN_SENT, false);
                         mMessage.pinInBackground();
@@ -137,7 +136,6 @@ public class MessageActivity extends ActionBarActivity {
                             push.sendPushNotification(getSupervisorIds(),
                                     getString(R.string.bullet_push_message,
                                             ParseUser.getCurrentUser().getUsername()));
-//                            sendMessagePushNotifications();
                         } else {
                             Toast.makeText(MessageActivity.this, "Problem sending message: " +
                                     e.getMessage(), Toast.LENGTH_LONG).show();
@@ -150,13 +148,38 @@ public class MessageActivity extends ActionBarActivity {
 
     protected ParseObject createMessage() {
 
+        String title;
+        String action;
+        String result;
+        String impact;
         String pass = ParseUser.getCurrentUser().getObjectId();
         DateHelper today = new DateHelper();
         String date = today.DateChangerThreeCharMonth();
 
-        String action = mActionText.getText().toString();
-        String result = mResultText.getText().toString();
-        String impact = mImpactText.getText().toString();
+        // prevents null object reference
+        if (mActionText.getText().toString().equals("")){
+            action = "empty";
+        }else{
+            action = mActionText.getText().toString();
+        }
+
+        if (mResultText.getText().toString().equals("")){
+            result = "empty";
+        }else{
+            result = mResultText.getText().toString();
+        }
+
+        if (mImpactText.getText().toString().equals("")){
+            impact = "empty";
+        }else{
+            impact = mImpactText.getText().toString();
+        }
+
+        if (mTitleText.getText().toString().equals("")){
+            title = "empty";
+        }else{
+            title = mTitleText.getText().toString();
+        }
 
         String encryptedAction = encryptThis(pass, action);
         String encryptedResult = encryptThis(pass, result);
@@ -166,12 +189,13 @@ public class MessageActivity extends ActionBarActivity {
         message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
         message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
         message.put(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
-        message.put(ParseConstants.KEY_BULLET_TITLE, mTitleText.getText().toString());
+        message.put(ParseConstants.KEY_BULLET_TITLE, title);
         message.put(ParseConstants.KEY_ACTION, encryptedAction);
         message.put(ParseConstants.KEY_RESULT, encryptedResult);
         message.put(ParseConstants.KEY_IMPACT, encryptedImpact);
         message.put(ParseConstants.KEY_CREATED_ON, date);
         message.put(ParseConstants.KEY_VIEWED, false);
+        message.put(ParseConstants.KEY_REQUEST_TYPE, "empty");
         message.put(ParseConstants.KEY_MESSAGE_TYPE, "bullet");
 
             return message;
@@ -184,16 +208,6 @@ public class MessageActivity extends ActionBarActivity {
         return supervisorID;
     }
 
-//    protected void sendMessagePushNotifications() {
-//        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-//        query.whereContains(ParseConstants.KEY_USER_ID, getSupervisorIds());
-//
-//        ParsePush push = new ParsePush();
-//        push.setQuery(query);
-//        push.setMessage(getString(R.string.bullet_push_message, ParseUser.getCurrentUser().getUsername()));
-//        push.sendInBackground();
-//
-//    }
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()

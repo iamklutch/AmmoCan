@@ -36,7 +36,7 @@ import java.util.List;
 
 
 /**
- * Created by James on 5/8/2015.
+ * Created by YukiDev on 5/8/2015.
  */
 public class InboxFragment extends android.support.v4.app.ListFragment {
 
@@ -55,7 +55,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             Bundle args = getArguments();
             mNetCheck = args.getBoolean("netCheck");
         } catch (NullPointerException e) {
-
+            // don't do anything
         }
 
         mCurrentUser = ParseUser.getCurrentUser();
@@ -84,8 +84,8 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     public void onResume() {
         super.onResume();
         // set progressbar visible
-        mProgressBar.setVisibility(View.VISIBLE);
-        retrieveMessages();
+//        mProgressBar.setVisibility(View.VISIBLE);
+//        retrieveMessages();
     }
 
     private void retrieveMessages() {
@@ -101,7 +101,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             query2.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
             query2.whereEqualTo(ParseConstants.KEY_TARGET_USER, mCurrentUser.getObjectId());
 
-            List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<ParseQuery<ParseObject>>();
+            List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<>();
             bothQuerys.add(query1);
             bothQuerys.add(query2);
 
@@ -185,7 +185,13 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 
         final ParseObject message = mMessages.get(position);
         final View mView = v;
-        if (message.get(ParseConstants.KEY_MESSAGE_TYPE) == ParseConstants.MESSAGE_TYPE_BULLET) {
+        if (message.get(ParseConstants.KEY_MESSAGE_TYPE).equals(ParseConstants.MESSAGE_TYPE_BULLET)) {
+//            MessageAdapter adapter = new MessageAdapter
+//                    (getListView().getContext(), mMessages);
+//            adapter.remove(message);
+//            adapter.notifyDataSetChanged();
+            mView.setVisibility(View.GONE);
+
             Intent intent = new Intent(getActivity(), ViewMessageActivity.class);
             intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
             intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
@@ -240,22 +246,25 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                     }
                     String returnID = message.get(ParseConstants.KEY_SENDER_ID).toString();
                     message.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
-                    message.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
+                    message.put(ParseConstants.KEY_SENDER_NAME,
+                            mCurrentUser.get(ParseConstants.KEY_DISPLAY_NAME));
                     message.put(ParseConstants.KEY_TARGET_USER, returnID);
-                    message.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
+                    message.put(ParseConstants.KEY_BULLET_TITLE,
+                            mCurrentUser.get(ParseConstants.KEY_DISPLAY_NAME) +
                             " has accepted your request!");
                     message.put(ParseConstants.KEY_REQUEST_TYPE, "ACCEPTED");
                     message.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
                             if (e == null) {
-                                MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                MessageAdapter adapter = new MessageAdapter
+                                        (getListView().getContext(), mMessages);
                                 adapter.remove(message);
                                 adapter.notifyDataSetChanged();
                                 mView.setVisibility(View.GONE);
 
                             } else {
-
+                                // do nothing
                             }
                         }
                     });
@@ -280,9 +289,12 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                 @Override
                 public void done(ParseUser parseUser, ParseException e) {
                     if (e == null) {
-                        if (!message.get(ParseConstants.KEY_ACTION).equals("Supervisor")){
-                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID,
-                                    message.get(ParseConstants.KEY_SUPERVISOR_ID));
+
+                        String supId = message.get(ParseConstants.KEY_SUPERVISOR_ID).toString();
+                        if (message.get(ParseConstants.KEY_ACTION).equals("Supervisor")){
+                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, supId);
+                            Toast.makeText(getActivity(), "Supervisor Added",
+                                                Toast.LENGTH_LONG).show();
                         }
                         mFriendRelation = mCurrentUser.
                                 getRelation(ParseConstants.KEY_FRIENDS_RELATION);

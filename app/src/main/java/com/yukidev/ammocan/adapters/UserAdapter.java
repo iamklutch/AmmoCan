@@ -22,7 +22,7 @@ import com.yukidev.ammocan.utils.ParseConstants;
 import java.util.List;
 
 /**
- * Created by James on 5/14/2015.
+ * Created by YukiDev on 5/14/2015.
  */
 public class UserAdapter extends ArrayAdapter<ParseUser> {
 
@@ -82,7 +82,7 @@ public class UserAdapter extends ArrayAdapter<ParseUser> {
         } catch (NullPointerException e) {
             holder.supervisorImageView.setVisibility(View.INVISIBLE);
         }
-        holder.nameLabel.setText(user.getUsername());
+        holder.nameLabel.setText(user.getString(ParseConstants.KEY_DISPLAY_NAME));
         holder.lastNameLabel.setText(user.getString(ParseConstants.KEY_LASTNAME));
         holder.squadronLabel.setText(user.getString(ParseConstants.KEY_SQUADRON));
 

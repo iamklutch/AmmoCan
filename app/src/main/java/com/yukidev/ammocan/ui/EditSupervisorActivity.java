@@ -111,7 +111,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
                 query3.whereContains(ParseConstants.KEY_SQUADRON, mUnitSearchVariable);
                 query3.whereNotEqualTo(ParseConstants.KEY_OBJECT_ID, mCurrentUser.getObjectId());
 
-                List<ParseQuery<ParseUser>> allQuerys = new ArrayList<ParseQuery<ParseUser>>();
+                List<ParseQuery<ParseUser>> allQuerys = new ArrayList<>();
                 allQuerys.add(query);
                 allQuerys.add(query2);
                 allQuerys.add(query3);
@@ -247,11 +247,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
                                             ParseUser.getCurrentUser().getUsername()));
                             Toast.makeText(EditSupervisorActivity.this, "Request sent",
                                     Toast.LENGTH_LONG).show();
-                            try {
-                                wait(1000);
-                            } catch (InterruptedException ie) {
-                                Log.e(TAG, "Interupted Exception: " + ie.getMessage());
-                            }
+
                             finish();
                         } else {
                             mProgressBar.setVisibility(View.INVISIBLE);

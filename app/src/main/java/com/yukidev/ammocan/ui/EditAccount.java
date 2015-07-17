@@ -50,7 +50,7 @@ public class EditAccount extends ActionBarActivity {
                 String newPass = mNewPassA.getText().toString().trim();
                 String newPassB = mNewPassB.getText().toString().trim();
 
-                if (newPass.equals(null) || newPassB.equals(null)) {
+                if (newPass.equals("") || newPassB.equals("")) {
                     Toast.makeText(EditAccount.this,
                             getString(R.string.password_change_empty_toast),
                             Toast.LENGTH_LONG).show();
@@ -105,7 +105,7 @@ public class EditAccount extends ActionBarActivity {
         switch (id) {
             case R.id.action_edit_account_save_changes:
                 mCurrentUser.put(ParseConstants.KEY_LASTNAME, mLastName.getText().toString());
-                mCurrentUser.put(ParseConstants.KEY_SQUADRON, mSquadron.getText().toString());
+                mCurrentUser.put(ParseConstants.KEY_SQUADRON, mSquadron.getText().toString().toUpperCase());
                 mCurrentUser.setEmail(mCurrentEmail.getText().toString());
                 mCurrentUser.saveInBackground(new SaveCallback() {
                     @Override

@@ -229,7 +229,8 @@ public class EditAirmenActivity extends ActionBarActivity {
                 request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
                 request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
                 request.put(ParseConstants.KEY_REQUEST_TYPE, "Airman");
-                request.put(ParseConstants.KEY_SUPERVISOR_ID, mCurrentUser.getObjectId());
+                request.put(ParseConstants.KEY_ACTION, "Airman");
+                request.put(ParseConstants.KEY_SUPERVISOR_ID, "none");
                 request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
                 request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
                         " wants to add you!");
