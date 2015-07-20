@@ -18,7 +18,7 @@ public class Crypto {
     Cipher mDecryptCipher;
 
     // salt makes everything taste better
-    byte[] salt = { 1, 2, 4, 5, 7, 8, 3, 6 };
+    byte[] salt = { *, *, *, *, *, *, *, * };
 
     // Iteration count
     int iterationCount = 1979;
