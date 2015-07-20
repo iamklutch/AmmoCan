@@ -11,14 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -106,7 +104,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             bothQuerys.add(query2);
 
             ParseQuery<ParseObject> mainQuery = ParseQuery.or(bothQuerys);
-            mainQuery.addAscendingOrder(ParseConstants.KEY_CREATED_ON);
+            mainQuery.addAscendingOrder(ParseConstants.KEY_CREATED_AT);
             mainQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> messages, ParseException e) {
@@ -157,11 +155,12 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             @Override
             public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, long id) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Delete Request/Bullet?");
+                builder.setTitle(getString(R.string.delete_request_or_bullet_title));
+                builder.setMessage(getString(R.string.completely_delete_message));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getActivity(), "Request/Bullet deleted", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.request_or_bullet_deleted), Toast.LENGTH_LONG).show();
                         ParseObject message = mMessages.get(position);
                         message.deleteInBackground();
                         MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
@@ -273,10 +272,14 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                        adapter.remove(message);
+                        adapter.notifyDataSetChanged();
+                    } catch (IllegalStateException ise){
+                        Log.e("InboxFragment:", ise.getMessage());
+                    }
                     message.deleteInBackground();
-                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-                    adapter.remove(message);
-                    adapter.notifyDataSetChanged();
                     mView.setVisibility(View.GONE);
                 }
             });
@@ -303,10 +306,14 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                             @Override
                             public void done(ParseException e) {
                                 if (e == null) {
+                                    try {
+                                        MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
+                                        adapter.remove(message);
+                                        adapter.notifyDataSetChanged();
+                                    } catch (IllegalStateException ise){
+                                        Log.e("InboxFragment:", ise.getMessage());
+                                    }
                                     message.deleteInBackground();
-                                    MessageAdapter adapter = new MessageAdapter(getListView().getContext(), mMessages);
-                                    adapter.remove(message);
-                                    adapter.notifyDataSetChanged();
                                     mView.setVisibility(View.GONE);
 
                                 } else {

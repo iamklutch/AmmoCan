@@ -37,7 +37,7 @@
     <string name="result_hint">Result: (What happened...)</string>
     <string name="impact_hint">Impact: (What did this action impact?)</string>
     <string name="find_supervisor_airmen_menu">Find Supervisor/Airmen</string>
-    <string name="title_activity_message">MessageActivity</string>
+    <string name="title_activity_message">Write Bullets</string>
 
     <string name="action_settings">Settings</string>
     <string name="action_download">Download</string>
@@ -79,5 +79,15 @@
     <string name="password_change_empty_toast">Please fill out all three password fields, then click the button</string>
     <string name="new_password_length_error_toast">Passwords must be at least 8 characters</string>
     <string name="password_changed_toast">Password changed</string>
+    <string name="completely_delete_message">This will COMPLETELY delete this bullet, there is no undo!</string>
+    <string name="delete_request_or_bullet_title">Delete Request/Bullet?</string>
+    <string name="request_or_bullet_deleted">Request/Bullet deleted</string>
+    <string name="internet_connection_unavailable">Internet connection unavailable</string>
+    <string name="see_my_bullets">See My Bullets</string>
+    <string name="edit_account_or_help">Edit Account/Help</string>
+    <string name="write_bullets">Write Bullets</string>
+    <string name="clear_list">Clear List</string>
+    <string name="clear_inbox_title">Clear Inbox?</string>
+    <string name="clear_inbox_message">Click OK and refresh to clean out your inbox</string>
 
 </resources>

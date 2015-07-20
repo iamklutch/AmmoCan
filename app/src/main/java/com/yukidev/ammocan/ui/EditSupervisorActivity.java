@@ -20,9 +20,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
 import com.parse.ParseObject;
-import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -263,8 +261,8 @@ public class EditSupervisorActivity extends ActionBarActivity {
             else {
                 // remove friend
                 AlertDialog.Builder builder = new AlertDialog.Builder(EditSupervisorActivity.this);
-                builder.setTitle("Remove as Supervisor?");
-                builder.setMessage("Click OK to remove this person as your supervisor");
+                builder.setTitle("Remove your Supervisor?");
+                builder.setMessage("Click OK to remove this person.");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

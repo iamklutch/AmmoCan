@@ -1,14 +1,13 @@
 package com.yukidev.ammocan;
 
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.util.Log;
 
 import com.parse.Parse;
+import com.parse.ParseCrashReporting;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParsePush;
-import com.parse.ParsePushBroadcastReceiver;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.utils.ParseConstants;
@@ -23,7 +22,12 @@ public class AmmoCanApplication extends Application{
     public void onCreate() {
         // Enable Local Datastore.
         super.onCreate();
+        // enable crash reporting
+        ParseCrashReporting.enable(this);
+
+        // enable local datat storage
         Parse.enableLocalDatastore(this);
+
         Parse.initialize(this, "M1VXE37uOtP4z4P66nDFkDZK1FjkSF2Q3KbPOqKo", "PGYVQUZflvPv114MqirAhbdlm8U4qzHMLADiRUXI");
 
         ParsePush.subscribeInBackground("", new SaveCallback() {

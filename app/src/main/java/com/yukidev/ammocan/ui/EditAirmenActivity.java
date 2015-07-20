@@ -1,6 +1,5 @@
 package com.yukidev.ammocan.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,7 +28,6 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 import com.yukidev.ammocan.adapters.UserAdapter;
 import com.yukidev.ammocan.utils.PushHelper;
@@ -61,7 +58,6 @@ public class EditAirmenActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.user_grid);
         ButterKnife.inject(this);
 
@@ -230,7 +226,7 @@ public class EditAirmenActivity extends ActionBarActivity {
                 request.put(ParseConstants.KEY_TARGET_USER, mUsers.get(position).getObjectId());
                 request.put(ParseConstants.KEY_REQUEST_TYPE, "Airman");
                 request.put(ParseConstants.KEY_ACTION, "Airman");
-                request.put(ParseConstants.KEY_SUPERVISOR_ID, "none");
+                request.put(ParseConstants.KEY_SUPERVISOR_ID, mCurrentUser.getObjectId());
                 request.put(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
                 request.put(ParseConstants.KEY_BULLET_TITLE, mCurrentUser.getUsername() +
                         " wants to add you!");
@@ -256,8 +252,8 @@ public class EditAirmenActivity extends ActionBarActivity {
             else {
                 // remove friend
                 AlertDialog.Builder builder = new AlertDialog.Builder(EditAirmenActivity.this);
-                builder.setTitle("Remove as Supervisor?");
-                builder.setMessage("Click OK to remove this person as your supervisor");
+                builder.setTitle("Remove this Airman?");
+                builder.setMessage("Click OK to remove this person.");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -285,14 +281,5 @@ public class EditAirmenActivity extends ActionBarActivity {
 
         }
 
-        protected void sendAddUserPushNotification(String targetID) {
-            ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-            query.whereContains(ParseConstants.KEY_USER_ID, targetID);
-
-            ParsePush push = new ParsePush();
-            push.setQuery(query);
-            push.setMessage(getString(R.string.request_push_message, ParseUser.getCurrentUser().getUsername()));
-            push.sendInBackground();
-        }
     };
 }

@@ -1,20 +1,15 @@
 package com.yukidev.ammocan.ui;
 
 
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -26,11 +21,11 @@ import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.MessageAdapter;
 import com.yukidev.ammocan.utils.ParseConstants;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
+
 public class AirmanBulletsActivity extends ActionBarActivity {
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +54,26 @@ public class AirmanBulletsActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        switch (id) {
+            case R.id.action_download:
+                AlertDialog.Builder builder = new AlertDialog.Builder(AirmanBulletsActivity.this);
+                builder.setTitle(getString(R.string.download_bullets_title));
+                builder.setMessage(getString(R.string.download_bullets_message));
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(AirmanBulletsActivity.this,
+                                AirmanBulletsActivity.class);
+                        intent.putExtra("objectId", ParseUser.getCurrentUser().getObjectId());
+                        intent.putExtra("download", true);
+                        startActivity(intent);
+                    }
+                });
+                builder.setNegativeButton("CANCEL", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                break;
+        }
 
         return super.onOptionsItemSelected(item);
     }

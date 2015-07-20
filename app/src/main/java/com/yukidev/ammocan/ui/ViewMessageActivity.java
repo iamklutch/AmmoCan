@@ -5,15 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -21,11 +17,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.utils.Crypto;
-import com.yukidev.ammocan.utils.DateHelper;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
-
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -78,18 +70,18 @@ public class ViewMessageActivity extends ActionBarActivity {
 
         }catch (ParseException e) {
             Toast.makeText(ViewMessageActivity.this,
-                    "Problem retrieveing message: " + e.getMessage(),
+                    "Problem retrieving message: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
 
-        mMessage.put(ParseConstants.KEY_VIEWED, true);
-        mMessage.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
+            mMessage.put(ParseConstants.KEY_VIEWED, true);
+            mMessage.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                    }
                 }
-            }
-        });
+            });
     }
 
     private ParseObject getMessage (String objectId) throws ParseException {

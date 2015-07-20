@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,24 +36,30 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
     private ProgressBar mProgressBar;
     protected List<ParseObject> mMessages;
     protected String mObjectId;
+    private Boolean mDownload;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
         Intent intent = getActivity().getIntent();
         mObjectId = intent.getStringExtra("objectId");
+        mDownload = intent.getBooleanExtra("download", false);
         retrieveMessages();
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.inboxProgressBar);
         mProgressBar.setVisibility(View.INVISIBLE);
         return rootView;
     }
 
-    private void retrieveMessages() {
+    protected void retrieveMessages() {
+
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
         query.whereEqualTo(ParseConstants.KEY_SENDER_ID, mObjectId);
         query.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_BULLET);
-        query.fromLocalDatastore();
-        query.fromPin(ParseConstants.CLASS_MESSAGES);
+        //if statement gets owners bullets from online
+        if (!mDownload){
+            query.fromPin(ParseConstants.CLASS_MESSAGES);
+        }
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
@@ -152,7 +159,6 @@ public class AirmanBulletsFragment extends android.support.v4.app.ListFragment {
     }
 
     public void downloadMessages(){
-
 
         mProgressBar.setVisibility(View.VISIBLE);
         ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);

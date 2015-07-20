@@ -3,7 +3,6 @@ package com.yukidev.ammocan.utils;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.parse.ParsePushBroadcastReceiver;
 

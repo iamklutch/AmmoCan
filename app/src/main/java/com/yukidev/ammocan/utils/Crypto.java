@@ -18,10 +18,10 @@ public class Crypto {
     Cipher mDecryptCipher;
 
     // salt makes everything taste better
-    byte[] salt = { 1, 2, 4, 5, 7, 8, 3, 6 };
+    byte[] salt = { 1, 3, 4, 8, 7, 4, 2, 6 };
 
     // Iteration count
-    int iterationCount = 1979;
+    int iterationCount = 1999;
 
     public Crypto(String passPhrase) {
         try {

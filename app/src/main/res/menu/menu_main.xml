@@ -8,19 +8,28 @@
             android:orderInCategory="100"
             app:showAsAction="never"/>
       <item android:id="@+id/action_edit_account"
-            android:title="Edit Account/Help"
+            android:title="@string/edit_account_or_help"
             android:orderInCategory="1"
+            app:showAsAction="never"/>
+      <item android:id="@+id/action_see_my_bullets"
+            android:title="@string/see_my_bullets"
+            android:orderInCategory="2"
             app:showAsAction="never"/>
       <item android:id="@+id/action_edit_friends"
             android:title="@string/find_supervisor_airmen_menu"
-            android:orderInCategory="1"
+            android:orderInCategory="2"
             android:icon="@drawable/ic_action_add_group"
             app:showAsAction="always"/>
+      <item android:id="@+id/action_clear_list"
+            android:title="@string/clear_list"
+            android:orderInCategory="1"
+            android:icon="@drawable/ic_action_remove"
+            app:showAsAction="always"/>
       <item android:id="@+id/action_message"
-            android:orderInCategory="2"
-            android:title="Camera"
+            android:orderInCategory="3"
+            android:title="@string/write_bullets"
             android:icon="@drawable/ic_action_edit"
-            app:showAsAction="ifRoom"
+            app:showAsAction="always"
           />
 
 </menu>

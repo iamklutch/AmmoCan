@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,10 +15,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
 import com.parse.ParseObject;
-import com.parse.ParsePush;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
@@ -34,8 +30,6 @@ import butterknife.InjectView;
 
 public class MessageActivity extends ActionBarActivity {
 
-    private static final String TAG = MessageActivity.class.getSimpleName();
-
     private ParseObject mMessage;
     InterstitialAd mInterstitialAd;
     @InjectView(R.id.titleText) EditText mTitleText;
@@ -46,11 +40,10 @@ public class MessageActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_message);
         ButterKnife.inject(this);
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId("ca-app-pub-7998491028752978/2165922641");
         requestNewInterstitial();
     }
 
@@ -71,6 +64,7 @@ public class MessageActivity extends ActionBarActivity {
         switch (id) {
             case R.id.action_message_send:
                 ParseObject message = createMessage();
+                message.pinInBackground();
                 if (message == null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
                     builder.setMessage(getString(R.string.title_section1))
@@ -187,7 +181,8 @@ public class MessageActivity extends ActionBarActivity {
 
         ParseObject message = new ParseObject(ParseConstants.CLASS_MESSAGES);
         message.put(ParseConstants.KEY_SENDER_ID, ParseUser.getCurrentUser().getObjectId());
-        message.put(ParseConstants.KEY_SENDER_NAME, ParseUser.getCurrentUser().getUsername());
+        message.put(ParseConstants.KEY_SENDER_NAME,
+                ParseUser.getCurrentUser().get(ParseConstants.KEY_DISPLAY_NAME));
         message.put(ParseConstants.KEY_SUPERVISOR_ID, getSupervisorIds());
         message.put(ParseConstants.KEY_BULLET_TITLE, title);
         message.put(ParseConstants.KEY_ACTION, encryptedAction);
@@ -195,6 +190,7 @@ public class MessageActivity extends ActionBarActivity {
         message.put(ParseConstants.KEY_IMPACT, encryptedImpact);
         message.put(ParseConstants.KEY_CREATED_ON, date);
         message.put(ParseConstants.KEY_VIEWED, false);
+        message.put(ParseConstants.KEY_BEEN_SENT, false);
         message.put(ParseConstants.KEY_REQUEST_TYPE, "empty");
         message.put(ParseConstants.KEY_MESSAGE_TYPE, "bullet");
 
@@ -211,7 +207,8 @@ public class MessageActivity extends ActionBarActivity {
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("YOUR_DEVICE_HASH")
+                .addTestDevice("97B607A2A8F6DD1E5594A294D7E066CA")
+                .addTestDevice("C4A083AE232F9FB04BFA58FBF0E57A0A")
                 .build();
 
         mInterstitialAd.loadAd(adRequest);

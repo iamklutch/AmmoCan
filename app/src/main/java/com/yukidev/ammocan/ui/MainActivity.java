@@ -19,24 +19,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
-import com.parse.ParseSession;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.yukidev.ammocan.R;
 import com.yukidev.ammocan.adapters.SectionsPagerAdapter;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import java.util.ArrayList;
@@ -44,8 +37,7 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener{
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-    protected ParseRelation<ParseUser> mFriendRelation;
+
     private ParseUser mCurrentUser;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -65,7 +57,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_main);
 
         Bundle bundle = new Bundle();
@@ -87,7 +78,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
         else {
             messageUpdater();
-//            checkAddUserRequests();
         }
 
 
@@ -95,9 +85,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // When swiping between different sections, select the corresponding
-        // tab. We can also use ActionBar.Tab#select() to do this if we have
-        // a reference to the Tab.
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -107,18 +94,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         // For each of the sections in the app, add a tab to the action bar.
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            // Create a tab with text corresponding to the page title defined by
-            // the adapter. Also specify this Activity object, which implements
-            // the TabListener interface, as the callback (listener) for when
-            // this tab is selected.
+
             actionBar.addTab(
                     actionBar.newTab()
                             // This is to set the Icon when you have some.
                             .setIcon(mSectionsPagerAdapter.getIcon(i)).setTabListener(this));
-
-//            These are to set the text in the tabs  add them after .newTab()
-//                            .setText(mSectionsPagerAdapter.getPageTitle(i))
-//                            .setTabListener(this));
         }
 
     }
@@ -146,6 +126,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             case R.id.action_edit_account:
                 Intent intent = new Intent(this, EditAccount.class);
                 startActivity(intent);
+                break;
+
+            case R.id.action_see_my_bullets:
+                String clickedId = mCurrentUser.getObjectId().toString();
+                intent = new Intent(MainActivity.this, AirmanBulletsActivity.class);
+                intent.putExtra("objectId", clickedId);
+                intent.putExtra("download", true);
+                startActivity(intent);
+                break;
+
+            case R.id.action_clear_list:
+                clearList();
                 break;
 
             case R.id.action_edit_friends:
@@ -263,22 +255,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     if (!isNetworkAvailable()) {
                         // no network so don't try to send message.
                         Toast.makeText(MainActivity.this,
-                                "Internet connection unavailable",
+                                getString(R.string.internet_connection_unavailable),
                                 Toast.LENGTH_LONG).show();
                     } else {
                         for (int i = 0; i < list.size(); i++) {
                             ParseObject currentMessage = list.get(i);
                             currentMessage.put(ParseConstants.KEY_BEEN_SENT, true);
-//                            currentMessage.put(ParseConstants.KEY_VIEWED, true);
                             currentMessage.saveEventually(new SaveCallback() {
                                 @Override
                                 public void done(ParseException f) {
                                     if (f == null) {
 
                                     } else {
-                                        Toast.makeText(MainActivity.this,
-                                                "Background message update failed",
-                                                Toast.LENGTH_LONG).show();
+                                        Log.e("MainActivity: ", "KEY_BEEN_SENT failed");
                                     }
                                 }
                             });
@@ -295,6 +284,44 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         });
     }
 
+    private void clearList(){
+        ParseQuery<ParseObject> query = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+        query.fromLocalDatastore();
+        query.whereEqualTo(ParseConstants.KEY_VIEWED, false);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(final List<ParseObject> list, ParseException e) {
+                if (e == null) {
+                    if (!isNetworkAvailable()) {
+
+                        // no network so don't try to send message.
+                        Toast.makeText(MainActivity.this,
+                                getString(R.string.internet_connection_unavailable),
+                                Toast.LENGTH_LONG).show();
+                    } else {
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle(getString(R.string.clear_inbox_title));
+                        builder.setMessage(getString(R.string.clear_inbox_message));
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                for (int i = 0; i < list.size(); i++) {
+                                    ParseObject currentMessage = list.get(i);
+                                    currentMessage.put(ParseConstants.KEY_VIEWED, true);
+                                    currentMessage.saveEventually();
+                                }
+                            }
+                        });
+                        builder.setNegativeButton("CANCEL", null);
+                        builder.create().show();
+
+                    }
+                }
+            }
+        });
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
@@ -306,56 +333,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         return isAvailable;
     }
 
-//    private void checkAddUserRequests(){
-//        ParseQuery<ParseObject> requestQuery = new ParseQuery<>(ParseConstants.CLASS_USER_REQUEST);
-//        requestQuery.whereEqualTo(ParseConstants.KEY_TARGET_USER,
-//                ParseUser.getCurrentUser().getObjectId());
-//        requestQuery.findInBackground(new FindCallback<ParseObject>() {
-//            @Override
-//            public void done(List<ParseObject> requests, ParseException e) {
-//                if (!requests.isEmpty()) {
-//
-//                    for (final ParseObject request : requests) {
-//
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//                        builder.setTitle("New request from " +
-//                                request.get(ParseConstants.KEY_REQUESTER_USERNAME));
-//                        builder.setMessage(request.get(ParseConstants.KEY_REQUESTER_USERNAME) +
-//                                " wants to add you as their " +
-//                                request.get(ParseConstants.KEY_REQUEST_TYPE));
-//                        builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-//                                userQuery.whereEqualTo(ParseConstants.KEY_OBJECT_ID,
-//                                        request.get(ParseConstants.KEY_REQUESTER_ID));
-//                                userQuery.getFirstInBackground(new GetCallback<ParseUser>() {
-//                                    @Override
-//                                    public void done(ParseUser parseUser, ParseException e) {
-//                                        if (e == null) {
-//                                            mFriendRelation = mCurrentUser.
-//                                                    getRelation(ParseConstants.KEY_FRIENDS_RELATION);
-//                                            mFriendRelation.add(parseUser);
-//                                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, request.
-//                                                    get(ParseConstants.KEY_REQUESTER_ID));
-//                                            mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_USERNAME, request.
-//                                                    get(ParseConstants.KEY_REQUESTER_USERNAME));
-//                                            request.deleteInBackground();
-//                                            mCurrentUser.saveInBackground();
-//                                        } else {
-//
-//                                        }
-//                                    }
-//                                });
-//                            }
-//                        });
-//                        builder.setNegativeButton("CANCEL", null);
-//                        builder.create().show();
-//                    }
-//                }
-//            }
-//        });
-//
-//
-//    }
+
+
 }

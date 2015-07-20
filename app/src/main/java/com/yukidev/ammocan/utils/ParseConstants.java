@@ -23,6 +23,7 @@ public final class ParseConstants {
     public static final String KEY_SENDER_NAME = "senderName";
     public static final String KEY_BULLET_TITLE = "bulletTitle";
     public static final String KEY_CREATED_ON = "createdOn";
+    public static final String KEY_CREATED_AT = "createdAt";
     public static final String KEY_ACTION = "action";
     public static final String KEY_RESULT = "result";
     public static final String KEY_IMPACT = "impact";

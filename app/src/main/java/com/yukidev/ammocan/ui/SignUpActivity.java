@@ -19,7 +19,6 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.yukidev.ammocan.R;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
@@ -40,7 +39,6 @@ public class SignUpActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_sign_up);
         ButterKnife.inject(this);
         mProgressBar.setVisibility(View.INVISIBLE);

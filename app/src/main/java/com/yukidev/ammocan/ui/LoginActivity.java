@@ -23,7 +23,6 @@ import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.yukidev.ammocan.AmmoCanApplication;
 import com.yukidev.ammocan.R;
-import com.yukidev.ammocan.utils.ExceptionHandler;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -41,7 +40,6 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
 
