@@ -214,12 +214,12 @@ public class EditAirmenActivity extends ActionBarActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final ImageView checkImageView = (ImageView)view.findViewById(R.id.checkImageView);
-            checkImageView.setImageResource(R.drawable.avatar_request_pending);
-            checkImageView.setVisibility(View.VISIBLE);
             mPosition = position;
             mView = view;
 
             if (mGridView.isItemChecked(position)){
+                checkImageView.setImageResource(R.drawable.avatar_request_pending);
+                checkImageView.setVisibility(View.VISIBLE);
                 ParseObject request = new ParseObject(ParseConstants.CLASS_MESSAGES);
                 request.put(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
                 request.put(ParseConstants.KEY_SENDER_NAME, mCurrentUser.getUsername());
@@ -251,20 +251,26 @@ public class EditAirmenActivity extends ActionBarActivity {
             }
             else {
                 // remove friend
-                AlertDialog.Builder builder = new AlertDialog.Builder(EditAirmenActivity.this);
-                builder.setTitle("Remove this Airman?");
-                builder.setMessage("Click OK to remove this person.");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mUsers.get(mPosition).unpinInBackground();
-                        mFriendRelation.remove(mUsers.get(mPosition));
-                        checkImageView.setVisibility(View.INVISIBLE);
-                        mCurrentUser.saveInBackground();
-                    }
-                });
-                builder.setNegativeButton("CANCEL", null);
-                builder.create().show();
+                String selectedUser = mUsers.get(position).getObjectId();
+                if (selectedUser.equals(mCurrentUser.get(ParseConstants.KEY_SUPERVISOR_ID))){
+                    Toast.makeText(EditAirmenActivity.this,
+                            R.string.remove_supervisor_airman_toast, Toast.LENGTH_LONG).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(EditAirmenActivity.this);
+                    builder.setTitle("Remove this Airman?");
+                    builder.setMessage("Click OK to remove this person.");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mUsers.get(mPosition).unpinInBackground();
+                            mFriendRelation.remove(mUsers.get(mPosition));
+                            checkImageView.setVisibility(View.INVISIBLE);
+                            mCurrentUser.saveInBackground();
+                        }
+                    });
+                    builder.setNegativeButton("CANCEL", null);
+                    builder.create().show();
+                }
             }
 
             mCurrentUser.saveInBackground(new SaveCallback() {

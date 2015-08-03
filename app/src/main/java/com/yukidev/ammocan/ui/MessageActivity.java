@@ -207,8 +207,8 @@ public class MessageActivity extends ActionBarActivity {
 
     private void requestNewInterstitial() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("97B607A2A8F6DD1E5594A294D7E066CA")
                 .addTestDevice("C4A083AE232F9FB04BFA58FBF0E57A0A")
+                .addTestDevice("ECE8D8561B65128D4A9A8080E2C6A51C")
                 .build();
 
         mInterstitialAd.loadAd(adRequest);

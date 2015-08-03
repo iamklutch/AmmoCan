@@ -99,6 +99,11 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             query2.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_REQUEST);
             query2.whereEqualTo(ParseConstants.KEY_TARGET_USER, mCurrentUser.getObjectId());
 
+            ParseQuery<ParseObject> query3 = new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+            query3.whereEqualTo(ParseConstants.KEY_MESSAGE_TYPE, ParseConstants.MESSAGE_TYPE_BULLET);
+            query3.whereEqualTo(ParseConstants.KEY_SENDER_ID, mCurrentUser.getObjectId());
+            query3.whereEqualTo(ParseConstants.KEY_VIEWED, false);
+
             List<ParseQuery<ParseObject>> bothQuerys = new ArrayList<>();
             bothQuerys.add(query1);
             bothQuerys.add(query2);
@@ -184,7 +189,11 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 
         final ParseObject message = mMessages.get(position);
         final View mView = v;
-        if (message.get(ParseConstants.KEY_MESSAGE_TYPE).equals(ParseConstants.MESSAGE_TYPE_BULLET)) {
+
+        if (message.get(ParseConstants.KEY_MESSAGE_TYPE).equals(ParseConstants.MESSAGE_TYPE_BULLET)
+                && !message.get(ParseConstants.KEY_SENDER_ID).equals(mCurrentUser.getObjectId()) ||
+                message.get(ParseConstants.KEY_SENDER_ID).equals(mCurrentUser.getObjectId()) &&
+                        message.get(ParseConstants.KEY_SENDER_NAME).equals("AmmoCan")) {
 //            MessageAdapter adapter = new MessageAdapter
 //                    (getListView().getContext(), mMessages);
 //            adapter.remove(message);
@@ -195,6 +204,20 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             intent.putExtra(ParseConstants.KEY_OBJECT_ID, message.getObjectId());
             intent.putExtra(ParseConstants.LOCAL_STORAGE, false);
             startActivity(intent);
+
+        }else if (message.get(ParseConstants.KEY_MESSAGE_TYPE).equals(ParseConstants.MESSAGE_TYPE_BULLET)
+                && message.get(ParseConstants.KEY_SENDER_ID).equals(mCurrentUser.getObjectId()) &&
+                message.get(ParseConstants.KEY_VIEWED).equals(false)){
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Sent bullet");
+            builder.setMessage("You created this bullet on " + message.get(ParseConstants.KEY_CREATED_ON));
+            builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
 
         } else if (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Airman") ||
                 (message.get(ParseConstants.KEY_REQUEST_TYPE).equals("Supervisor"))){
@@ -216,7 +239,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                             @Override
                             public void done(ParseUser parseUser, ParseException e) {
                                 if (e == null) {
-                                    String supervisorID = message.get
+                                    final String supervisorID = message.get
                                             (ParseConstants.KEY_SUPERVISOR_ID).toString();
                                     mFriendRelation = mCurrentUser.
                                             getRelation(ParseConstants.KEY_FRIENDS_RELATION);
@@ -224,6 +247,27 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                                     mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID,
                                             supervisorID);
                                     mCurrentUser.saveEventually();
+
+                                    // add supervisorID to prewritten bullets
+                                    ParseQuery<ParseObject> changeMessageSupId =
+                                            new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
+                                    changeMessageSupId.whereEqualTo(ParseConstants.KEY_SENDER_ID,
+                                            mCurrentUser.getObjectId());
+                                    changeMessageSupId.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, "none");
+                                    changeMessageSupId.findInBackground(new FindCallback<ParseObject>() {
+                                        @Override
+                                        public void done(List<ParseObject> list, ParseException e) {
+                                            if (e == null){
+                                                for (int i = 0; i < list.size(); i++) {
+                                                    ParseObject bullet = list.get(i);
+                                                    bullet.put(ParseConstants.KEY_SUPERVISOR_ID, supervisorID);
+                                                    bullet.saveEventually();
+                                                }
+                                            } else {
+                                                Log.e("InboxFragment:", "cant get prewritten bullets list");
+                                            }
+                                        }
+                                    });
                                 }
                             }
                         });

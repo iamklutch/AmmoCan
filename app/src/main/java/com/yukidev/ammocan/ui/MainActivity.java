@@ -147,12 +147,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 dialog.show();
                 break;
             case R.id.action_message:
-                if (mCurrentUser.get(ParseConstants.KEY_SUPERVISOR_ID).equals("none")){
-                    Toast.makeText(this, "Please add a supervisor first!", Toast.LENGTH_LONG).show();
-                } else {
+//                if (mCurrentUser.get(ParseConstants.KEY_SUPERVISOR_ID).equals("none")){
+//                    Toast.makeText(this, "Please add a supervisor first!", Toast.LENGTH_LONG).show();
+//                } else {
                     intent = new Intent(this, MessageActivity.class);
                     startActivity(intent);
-                }
+//                }
 
                 break;
         }
@@ -254,9 +254,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 if (e == null) {
                     if (!isNetworkAvailable()) {
                         // no network so don't try to send message.
-                        Toast.makeText(MainActivity.this,
-                                getString(R.string.internet_connection_unavailable),
-                                Toast.LENGTH_LONG).show();
+                        Log.e("MainActivity: ", "MessageUpdater: No network");
                     } else {
                         for (int i = 0; i < list.size(); i++) {
                             ParseObject currentMessage = list.get(i);
@@ -275,9 +273,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     }
 
                 } else {
-                    Toast.makeText(MainActivity.this,
-                            "Stored messages unavailable",
-                            Toast.LENGTH_LONG).show();
+                    Log.e("MainActivity: ", "MessageUpdater: failed retrieving local messages");
                 }
 
             }

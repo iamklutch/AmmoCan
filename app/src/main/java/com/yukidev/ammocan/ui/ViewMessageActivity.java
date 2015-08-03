@@ -73,7 +73,7 @@ public class ViewMessageActivity extends ActionBarActivity {
                     "Problem retrieving message: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
-
+        try {
             mMessage.put(ParseConstants.KEY_VIEWED, true);
             mMessage.saveInBackground(new SaveCallback() {
                 @Override
@@ -82,6 +82,10 @@ public class ViewMessageActivity extends ActionBarActivity {
                     }
                 }
             });
+        } catch (NullPointerException npe) {
+            finish();
+        }
+
     }
 
     private ParseObject getMessage (String objectId) throws ParseException {

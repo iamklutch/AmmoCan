@@ -268,7 +268,7 @@ public class EditSupervisorActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         mUsers.get(mPosition).unpinInBackground();
                         mFriendRelation.remove(mUsers.get(mPosition));
-                        mCurrentUser.remove(ParseConstants.KEY_SUPERVISOR_ID);
+                        mCurrentUser.put(ParseConstants.KEY_SUPERVISOR_ID, "none");
                         checkImageView.setVisibility(View.INVISIBLE);
                         supImageView.setVisibility(View.INVISIBLE);
                         mCurrentUser.saveInBackground();

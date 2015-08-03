@@ -16,9 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 import com.yukidev.ammocan.R;
+import com.yukidev.ammocan.utils.Crypto;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 import butterknife.ButterKnife;
@@ -27,13 +30,14 @@ import butterknife.InjectView;
 
 public class SignUpActivity extends ActionBarActivity {
 
-    protected EditText mUsername;
-    protected EditText mPassword;
-    protected EditText mPassword2;
-    protected EditText mLastName;
-    protected EditText mSquadron;
-    protected EditText mEmail;
-    protected Button mSignUpButton;
+
+    @InjectView(R.id.usernameField)EditText mUsername;
+    @InjectView(R.id.passwordField)EditText mPassword;
+    @InjectView(R.id.passwordField2)EditText mPassword2;
+    @InjectView(R.id.lastNameText)EditText mLastName;
+    @InjectView(R.id.squadronText)EditText mSquadron;
+    @InjectView(R.id.emailField)EditText mEmail;
+    @InjectView(R.id.signupButton)Button mSignUpButton;
     @InjectView(R.id.signUpProgressBar)ProgressBar mProgressBar;
 
     @Override
@@ -43,13 +47,6 @@ public class SignUpActivity extends ActionBarActivity {
         ButterKnife.inject(this);
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        mUsername = (EditText)findViewById(R.id.usernameField);
-        mPassword = (EditText)findViewById(R.id.passwordField);
-        mPassword2 = (EditText)findViewById(R.id.passwordField2);
-        mLastName = (EditText)findViewById(R.id.lastNameText);
-        mSquadron = (EditText)findViewById(R.id.squadronText);
-        mEmail = (EditText)findViewById(R.id.emailField);
-        mSignUpButton = (Button)findViewById(R.id.signupButton);
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,6 +95,42 @@ public class SignUpActivity extends ActionBarActivity {
                             public void done(ParseException e) {
                                 if (e == null) {
                                     // success creating user
+
+                                    final ParseObject message =
+                                            new ParseObject(ParseConstants.CLASS_MESSAGES);
+                                    String mCurrentUser = ParseUser.getCurrentUser().getObjectId();
+                                    message.put(ParseConstants.KEY_SENDER_ID,
+                                           mCurrentUser);
+                                    message.put(ParseConstants.KEY_SENDER_NAME,"AmmoCan");
+                                    message.put(ParseConstants.KEY_TARGET_USER,
+                                            mCurrentUser);
+                                    message.put(ParseConstants.KEY_BULLET_TITLE,
+                                            "Welcome to AmmoCan!");
+                                    String encAction = encryptThis(mCurrentUser,
+                                            getString(R.string.welcome_action_message));
+                                    String encResult = encryptThis(mCurrentUser,
+                                            getString(R.string.welcome_result_message));
+                                    String encImpact = encryptThis(mCurrentUser,
+                                            getString(R.string.welcome_impact_message));
+                                    message.put(ParseConstants.KEY_ACTION, encAction);
+                                    message.put(ParseConstants.KEY_RESULT, encResult);
+                                    message.put(ParseConstants.KEY_IMPACT, encImpact);
+                                    message.put(ParseConstants.KEY_SUPERVISOR_ID, mCurrentUser);
+                                    message.put(ParseConstants.KEY_VIEWED, false);
+                                    message.put(ParseConstants.KEY_BEEN_SENT, false);
+                                    message.put(ParseConstants.KEY_REQUEST_TYPE, "empty");
+                                    message.put(ParseConstants.KEY_MESSAGE_TYPE, "bullet");
+                                    message.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null){
+
+                                            } else {
+                                                message.pinInBackground(ParseConstants.CLASS_MESSAGES);
+                                            }
+                                        }
+                                    });
+
                                     mProgressBar.setVisibility(View.INVISIBLE);
 
                                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
@@ -155,5 +188,16 @@ public class SignUpActivity extends ActionBarActivity {
             isAvailable = true;
         }
         return isAvailable;
+    }
+
+    private String encryptThis(String pass, String data) {
+        String encryptedData = "";
+        try {
+            Crypto crypto = new Crypto(pass);
+            encryptedData = crypto.encrypt(data);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        return encryptedData;
     }
 }

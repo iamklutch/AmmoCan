@@ -13,7 +13,7 @@ import com.parse.SaveCallback;
 import com.yukidev.ammocan.utils.ParseConstants;
 
 /**
- * Created by James on 6/18/2015.
+ * AmmoCan, created by YukiDev on 6/18/2015.  All rights reserved.
  */
 public class AmmoCanApplication extends Application{
 // Enable Local Datastore.

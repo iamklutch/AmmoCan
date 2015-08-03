@@ -64,17 +64,16 @@
     <!--Real Ad ID-->
     <!--<String name="banner_ad_unit_id">ca-app-pub-7998491028752978/3341715049</String>-->
     <!--Test Ad ID-->
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <!--<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>-->
     <string name="download_bullets_title">Download all Bullets?</string>
     <string name="download_bullets_message">Click OK to download all available bullets for this user</string>
     <string name="title_activity_edit_account">Edit Account Details</string>
     <string name="new_password">New password</string>
     <string name="current_email">Current Email</string>
     <string name="help_text">Currently, you can only have one user tagged as your supervisor.
-        Bullets you write will go to the person tagged as your supervisor. \n \n To view all bullets from
-    an airman, just tap an airman in your friend list. NOTE: you can\'t look at your supervisors
-    bullets. \n \n If you have problems with this app, you are screwed. Just kidding, email
-    yuki.developers@gmail.com with what you were doing when the app crashed. \n \n
+        Bullets you write will go to the person tagged as your supervisor. \n \n To change your Supervisor,
+        just search and add your new supervisor.\n \n To view all bullets from an airman, just tap
+        an airman in your friend list. \n \n If you have problems with this app email yuki.developers@gmail.com. \n \n
         If you find this free app helpful, click an ad to support us!</string>
     <string name="password_change_empty_toast">Please fill out all three password fields, then click the button</string>
     <string name="new_password_length_error_toast">Passwords must be at least 8 characters</string>
@@ -89,5 +88,9 @@
     <string name="clear_list">Clear List</string>
     <string name="clear_inbox_title">Clear Inbox?</string>
     <string name="clear_inbox_message">Click OK and refresh to clean out your inbox</string>
+    <string name="welcome_action_message">Glad you made it! The screen you just came from is your inbox.  You\'ll see requests there when people want to add you as a supervisor or an airman, or you\'ll see when one of your airmen sends you a bullet.</string>
+    <string name="welcome_result_message">This screen is where you\'ll view or write bullets.  To write a bullet, tap the pencil on the taskbar.  To view a bullet, just tap it!</string>
+    <string name="welcome_impact_message">To add people, select the group icon with the plus sign up top.  From there you can choose to select your supervisor or select some airmen.  You can only have one supervisor at this time, but you can have as many airmen as you want.</string>
+    <string name="remove_supervisor_airman_toast">Please remove supervisor with Add/Remove supervisor option</string>
 
 </resources>

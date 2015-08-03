@@ -140,12 +140,16 @@ public class FriendsFragment extends Fragment {
                             i++;
                         }
                         if (mGridView.getAdapter() == null) {
-                            UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
-                            mGridView.setAdapter(adapter);
+                            try{
+                                UserAdapter adapter = new UserAdapter(getActivity(), mFriends);
+                                mGridView.setAdapter(adapter);
+                            } catch (NullPointerException npe) {
+
+                            }
+
                         } else {
                             ((UserAdapter) mGridView.getAdapter()).refill(mFriends);
                         }
-
 
                     } else if (e.getMessage().equals("java.lang.ClassCastException: " +
                             "java.lang.String cannot be cast to org.json.JSONObject")) {
@@ -153,14 +157,6 @@ public class FriendsFragment extends Fragment {
 
                     } else {
                         Log.e(TAG, e.getMessage());
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                        builder.setMessage(e.getMessage())
-//                                .setTitle(R.string.error_title)
-//                                .setPositiveButton(android.R.string.ok, null);
-//
-//                        AlertDialog dialog = builder.create();
-//                        dialog.show();
-
                     }
                 }
             });
