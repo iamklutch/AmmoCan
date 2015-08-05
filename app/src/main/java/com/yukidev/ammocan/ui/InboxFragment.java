@@ -248,26 +248,6 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                                             supervisorID);
                                     mCurrentUser.saveEventually();
 
-                                    // add supervisorID to prewritten bullets
-                                    ParseQuery<ParseObject> changeMessageSupId =
-                                            new ParseQuery<>(ParseConstants.CLASS_MESSAGES);
-                                    changeMessageSupId.whereEqualTo(ParseConstants.KEY_SENDER_ID,
-                                            mCurrentUser.getObjectId());
-                                    changeMessageSupId.whereEqualTo(ParseConstants.KEY_SUPERVISOR_ID, "none");
-                                    changeMessageSupId.findInBackground(new FindCallback<ParseObject>() {
-                                        @Override
-                                        public void done(List<ParseObject> list, ParseException e) {
-                                            if (e == null){
-                                                for (int i = 0; i < list.size(); i++) {
-                                                    ParseObject bullet = list.get(i);
-                                                    bullet.put(ParseConstants.KEY_SUPERVISOR_ID, supervisorID);
-                                                    bullet.saveEventually();
-                                                }
-                                            } else {
-                                                Log.e("InboxFragment:", "cant get prewritten bullets list");
-                                            }
-                                        }
-                                    });
                                 }
                             }
                         });
